@@ -79,23 +79,6 @@ function statFromAbbrev(abbrev_name) {
 	}
 }
 
-//USE IF NECESSARY, DELETE OTHERWISE
-/*
-function abbrevFromStat(stat_name) {
-	switch(stat_name) {
-		case "3-Pointers Attempted":
-			return "FG3A";
-		case "3-Pointers Made":
-			return "FG3M";
-		case "Field Goals Attempted":
-			return "FGA";
-		case "Field Goals Made":
-			return "FGM";
-		case "Field Goal Percentage":
-			return "FG_PCT";
-	}
-}
-*/
 
 function userGenerateGraph() {
 	let x = document.getElementById("x-axis").value;
@@ -108,7 +91,7 @@ function generateGraph(x, y) {
 	d3.csv("player_average.csv").then((data) => {
 
 		//preparing x data and axis:
-		let x_data = Array(633);
+		let x_data = Array(488);
 		for (let n = 0; n < data.length; n++) {
 				if (isNaN(parseFloat(data[n][x]))) {
 					x_data[n] = 0.0;
@@ -122,7 +105,7 @@ function generateGraph(x, y) {
 							 .range([0, (VIS_WIDTH)]);
 
 		//preparing y data and axis:
-		let y_data = Array(633);
+		let y_data = Array(488);
 		for (let n = 0; n < data.length; n++) {
 			if (isNaN(parseFloat(data[n][y]))) {
 					y_data[n] = 0.0;
@@ -150,6 +133,7 @@ function generateGraph(x, y) {
 						return y_axis_scale(d[y]) + MARGINS.bottom;})
 					.attr("r", 4)
 					.attr("class", "point");
+						//(d) => {return d.TEAM_ABBREVIATION});
 
 		//adding title to scatterplot
 		SCATTERFRAME.append("text")
@@ -172,7 +156,45 @@ function generateGraph(x, y) {
 					"translate(" + MARGINS.left + "," + MARGINS.bottom + ")")
 			.call(d3.axisLeft(y_axis_scale).ticks(5))
 		        .attr("font-size", "20px");
+
+
+		//adding tooltip
+	 	const TOOLTIP = d3.select("#scattervis")
+	 						.append("div")
+	 							.attr("class", "tooltip")
+	 							.style("opacity", 0);
+
+		//tooltip behavior when mousing over a point
+	 	function mouseover(event, d) {
+	 		TOOLTIP.style("opacity", 1);
+	 	}
+
+	 	//tooltip behavior when moving mouse while on a point
+	 	function mousemove(event, d) {
+	 		TOOLTIP.html("Player Name: " + d.PLAYER_NAME 
+							+ "<br>Team: " + d.TEAM_ABBREVIATION
+							+ "<br>Position: " + d.START_POSITION
+							+ "<br>" + statFromAbbrev(x) + ": " + d[x]
+							+ "<br>" + statFromAbbrev(y) + ": " + d[y])
+	 			.style("left", (event.pageX + 5) + "px")
+	 			.style("top", (event.pageY - 50) + "px");
+	 	}
+
+	 	//tooltip behavior when moving mouse off of bar
+	 	function mouseleave(event, d) {
+	 		TOOLTIP.style("opacity", 0)
+	 				.style("left", 0 + "px")
+	 				.style("top", 0 + "px");;
+ 		}
+
+ 		SCATTERFRAME.selectAll("circle")
+ 			.on("mouseover", mouseover)
+ 			.on("mousemove", mousemove)
+ 			.on("mouseleave", mouseleave);
+
 /*
+
+
 		//add brushing
 		SCATTERFRAME.call(d3.brush()                 
 		      .extent([[0,0], [FRAME_WIDTH, FRAME_HEIGHT]])

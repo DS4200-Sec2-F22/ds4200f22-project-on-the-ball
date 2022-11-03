@@ -13,15 +13,144 @@ h1 {
   border-width: 5px;
 }
 
-.point {
-    fill: black;
+.MIN {
+    fill: rgb(12, 35, 64);
 }
 
-.point:hover {
-    fill: orange;
+.MIA {
+    fill: rgb(152, 0, 46);
+}
+
+.CLE {
+    fill: rgb(134, 0, 56);
+}
+
+.CHI {
+    fill: rgb(206, 17, 65);
+}
+
+.IND {
+    fill: rgb(253, 187, 48);
+}
+
+.SAS {
+    fill: rgb(196, 206, 211);
+}
+
+.MIL {
+    fill: rgb(0, 71, 27);
+}
+
+.GSW {
+    fill: rgb(29, 66, 138);
+}
+
+.TOR {
+    fill: rgb(206, 17, 65);
+}
+
+.DEN {
+    fill: rgb(13, 34, 64);
+}
+
+.SAC {
+    fill: rgb(91,43,130);
+}
+
+.UTA {
+    fill: rgb();
+}
+
+.WAS {
+
+}
+
+.POR {
+
+}
+
+.ORL {
+
+}
+
+.LAC {
+
+}
+
+.ATL {
+
+}
+
+.DET {
+
+}
+
+.BOS {
+
+}
+
+.DAL {
+
+}
+
+.HOU {
+
+}
+
+.NYK {
+
+}
+
+.MEM {
+
+}
+
+.CHA {
+
+}
+
+.NOP {
+
+}
+
+.PHX {
+
+}
+
+.LAL {
+
+}
+
+.BKN {
+
+}
+
+.PHI {
+
+}
+
+.OKC {
+
+}
+
+.point {
+    fill: darkgreen;
+}
+
+circle:hover {
+    fill: orange !important;
 }
 
 .selected {
   stroke: orange;
   stroke-width: 2px;
+}
+
+.tooltip {
+  position: absolute;
+  background-color: lightblue;
+  border:  solid;
+  border-width: 2px;
+  border-radius: 5px;
+  padding: 5px;
 }
