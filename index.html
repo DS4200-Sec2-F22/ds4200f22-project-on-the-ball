@@ -4,7 +4,7 @@
 <head>
     <meta charset=utf-8/>
     <link rel="stylesheet" type="text/css" href="style.css">
-
+    <script type="text/javascript" src="js/d3.v6.1.1/d3.min.js"></script>
     <title>TODO: Add short title here</title>
 </head>
 
@@ -37,12 +37,24 @@
     <div class="flex-container">
     <div id="column1">
         <h2>Sepal Length vs. Petal Length</h2>
-        <div id="length_scatter"></div>
+        <div id="scattervis"></div>
+        <div id="histogram_x"></div>
+
     </div>
     <div id="column2">
-      <h2>Sepal Width vs. Petal Width</h2>
-      <div id="width_scatter"></div>
+        <label for="x-axis">Select the stat to be displayed on the x-axis.</label>
+                <select name="x-axis" id="x-axis">
+                    <option value="3-Pointers Attempted">3-Pointers Attempted</option>
+                    <option value="3-Pointers Made">3-Pointers Made</option>
+                </select><br><br>
+        <label for="y-axis">Select the stat to be displayed on the y-axis.</label>
+                <select name="y-axis" id="y-axis">
+                    <option value="3-Pointers Attempted">3-Pointers Attempted</option>
+                    <option value="3-Pointers Made">3-Pointers Made</option>
+                </select><br><br>
+            <button type = "button" id = "graphButton">Generate Charts</button>
     </div>
+  <script type="text/javascript" src="main.js"></script>
 
 </body>
 
