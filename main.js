@@ -27,18 +27,6 @@ const SCATTERFRAME = d3.select("#scattervis")
 					.attr("width", FRAME_WIDTH)
 					.attr("class", "frame");
 
-d3.csv("player_average.csv").then((data) => {
-		//appending points 
-		let scatter = SCATTERFRAME.selectAll("circle")
-				.data(data)
-				.enter()
-				.append("circle")
-					.attr("cx", (d) => {return FG3A_SCALE(d.FG3A) + MARGINS.left;})
-					.attr("cy", (d) => {return VIS_HEIGHT - FG3M_SCALE(d.FG3M) + MARGINS.top;})
-					.attr("r", 2)
-					.attr("class", "point");
-	});
-
 
 //plotting user-added points
 document.getElementById("graphButton").addEventListener('click', userGenerateGraph);
@@ -49,47 +37,106 @@ function statFromAbbrev(abbrev_name) {
 			return "3-Pointers Attempted";
 		case "FG3M":
 			return "3-Pointers Made";
+		case "FG3_PCT":
+			return "3-Point Percentage";
+		case "FGA":
+			return "Field Goals Attempted";
+		case "FGM":
+			return "Field Goals Made";
+		case "FG_PCT":
+			return "Field Goal Percentage";
+		case "GP":
+			return "Games Played";
+		case "FTM":
+			return "Free Throws Made";
+		case "FTA":
+			return "Free Throws Attempted";
+		case "FT_PCT":
+			return "Free Throw Percentage";
+		case "EFG":
+			return "Effective Field Goal Percentage";
+		case "OREB":
+			return "Offensive Rebounds";
+		case "DREB":
+			return "Defensive Rebounds";
+		case "REB":
+			return "Rebounds";
+		case "AST":
+			return "Assists";
+		case "STL":
+			return "Steals";
+		case "BLK":
+			return "Blocks";
+		case "TO":
+			return "Turnovers";
+		case "PF":
+			return "Fouls";
+		case "PTS":
+			return "Points";
+		case "PLUS_MINUS":
+			return "Plus-Minus";
+
 	}
 }
 
+//USE IF NECESSARY, DELETE OTHERWISE
+/*
 function abbrevFromStat(stat_name) {
 	switch(stat_name) {
 		case "3-Pointers Attempted":
 			return "FG3A";
 		case "3-Pointers Made":
 			return "FG3M";
+		case "Field Goals Attempted":
+			return "FGA";
+		case "Field Goals Made":
+			return "FGM";
+		case "Field Goal Percentage":
+			return "FG_PCT";
 	}
 }
+*/
 
 function userGenerateGraph() {
 	let x = document.getElementById("x-axis").value;
 	let y = document.getElementById("y-axis").value;
-	generateGraph(abbrevFromStat(x), abbrevFromStat(y));
+	generateGraph(x, y);
 }
 
 //using two stat abbreviations, generate a graph
 function generateGraph(x, y) {
 	d3.csv("player_average.csv").then((data) => {
+
 		//preparing x data and axis:
 		let x_data = Array(633);
 		for (let n = 0; n < data.length; n++) {
-			x_data[n] = parseFloat(data[n][x]);
-		}
+				if (isNaN(parseFloat(data[n][x]))) {
+					x_data[n] = 0.0;
+				} else {
+					x_data[n] = parseFloat(data[n][x]);
+				}
+			}
 
 		let x_axis_scale = d3.scaleLinear()
-							 .domain([0, (1.1 * Math.max(...x_data))])
-							 .range([0, (VIS_WIDTH)])
+							 .domain([0, (1.05 * Math.max(...x_data))])
+							 .range([0, (VIS_WIDTH)]);
 
 		//preparing y data and axis:
 		let y_data = Array(633);
 		for (let n = 0; n < data.length; n++) {
-			y_data[n] = parseFloat(data[n][y]);
+			if (isNaN(parseFloat(data[n][y]))) {
+					y_data[n] = 0.0;
+				} else {
+					y_data[n] = parseFloat(data[n][y]);
+				}
 		}
-		console.log(y_data)
-		console.log(Math.max(...y_data));
 		let y_axis_scale = d3.scaleLinear()
-							 .domain([0, (1.1 * Math.max(...y_data))])
-							 .range([0, (VIS_WIDTH)])
+							 .domain([0, (1.05 * Math.max(...y_data))])
+							 .range([(VIS_HEIGHT), 0])
+
+		SCATTERFRAME.selectAll("circle").remove();
+		SCATTERFRAME.selectAll("g").remove();
+		SCATTERFRAME.selectAll("text").remove();
 
 		//appending points 
 		let scatter = SCATTERFRAME.selectAll("circle")
@@ -100,13 +147,59 @@ function generateGraph(x, y) {
 						return x_axis_scale(d[x]) + MARGINS.left;
 					})
 					.attr("cy", function(d) {
-						return VIS_HEIGHT - y_axis_scale(d[y]) + MARGINS.top;})
-					.attr("r", 2)
+						return y_axis_scale(d[y]) + MARGINS.bottom;})
+					.attr("r", 4)
 					.attr("class", "point");
-	});
-	
+
+		//adding title to scatterplot
+		SCATTERFRAME.append("text")
+						.attr("x", FRAME_WIDTH / 2)
+						.attr("y", MARGINS.top)
+						.attr("text-anchor", "middle")
+						.text(statFromAbbrev(x) + " vs. " + statFromAbbrev(y));
+
+		//adding x-axis to scatterplot
+		SCATTERFRAME.append("g")
+		    .attr("transform", 
+		          "translate(" + MARGINS.left + "," + (VIS_HEIGHT + MARGINS.top) + ")")
+		    .call(d3.axisBottom(x_axis_scale).ticks(7))
+		        .attr("font-size", "20px");
+
+
+		//adding y-axis to scatterplot
+		SCATTERFRAME.append("g")
+			.attr("transform",
+					"translate(" + MARGINS.left + "," + MARGINS.bottom + ")")
+			.call(d3.axisLeft(y_axis_scale).ticks(5))
+		        .attr("font-size", "20px");
+/*
+		//add brushing
+		SCATTERFRAME.call(d3.brush()                 
+		      .extent([[0,0], [FRAME_WIDTH, FRAME_HEIGHT]])
+		      .on("start brush", updateChart)
+		      );
+
+		// Function that is triggered when brushing is performed
+		function updateChart() {
+			extent = d3.brushSelection(this);
+			scatter.classed("selected", function(d) {
+				return isBrushed(extent, x_axis_scale(d[x]) + MARGINS.left, y_axis_scale(d[y]) + MARGINS.top);
+			});
+		}
+
+		 // A function that return TRUE or FALSE according if a dot is in the selection or not
+		function isBrushed(brush_coords, cx, cy) {
+		     var x0 = brush_coords[0][0],
+		         x1 = brush_coords[1][0],
+		         y0 = brush_coords[0][1],
+		         y1 = brush_coords[1][1];
+		    return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;    // This return TRUE or FALSE depending on if the points is in the selected area
+		}
+	*/
+	});	
 }
 
+generateGraph('FG3A', 'FG3M')
 
 
 //
@@ -129,7 +222,7 @@ d3.csv("player_average.csv", function(data) {
 
   // X axis: scale and draw:
   var x = d3.scaleLinear()
-      .domain([0, d3.max(data, function(d) { return +d.FGM })])
+      .domain([0, d3.max(data, function(d) { return d.FGM; })])
       .range([0, width]);
   svg.append("g")
       .attr("transform", "translate(0," + height + ")")
@@ -161,3 +254,4 @@ d3.csv("player_average.csv", function(data) {
         .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
         .attr("height", function(d) { return height - y(d.length); })
         .style("fill", "#69b3a2")
+});

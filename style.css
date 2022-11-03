@@ -12,3 +12,16 @@ h1 {
   align-items: center;
   border-width: 5px;
 }
+
+.point {
+    fill: black;
+}
+
+.point:hover {
+    fill: orange;
+}
+
+.selected {
+  stroke: orange;
+  stroke-width: 2px;
+}
