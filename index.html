@@ -5,40 +5,157 @@
     <link rel="shortcut icon" href="#" />
     <link rel="stylesheet" type="text/css" href="style.css">
     <script type="text/javascript" src="js/d3.v6.1.1/d3.min.js"></script>
-    <title>TODO: Add short title here</title>
+    <title>OnTheBall</title>
 </head>
 
 
 <body>
 
-    <h1>TODO: Add project title here</h1>
+    <h1>OnTheBall: Analytics Visualization Tool for the Basketball Analyst</h1>
 
     <div>
         <h2>Motivation</h2>
-        TODO: Add motivation / use case here 
+
+        <p>Data-Driven analysis for the game of Basketball has surged in popularity in recent years. While large amounts of data are collected
+            about the game, effective analysis and visualization tools are still
+            in their infancy. To aid in the analysis of the large amounts of data
+            collected, we have created a visualization tool to perform domainspecific tasks in the field of Basketball analytics. Our approach
+            towards tackling this issue provides a robust tool for visualization of
+            data for use by Basketball analysts, coaches, and general managers.</p>
+        <p>Domain problems that need to be tackled are the ability to directly compare the visualized statistics of individual players and 
+            teams to discover where some excel and where some falter. These insights provide novel approaches and strategies to the game of 
+            Basketball. Another specific domain problem is needing to identify what specific statistics are conducive to winning the game. 
+            while the game is decided by the number of points scored by each team, certain statistics may be heavily correlated with 
+            favorable game outcomes. </p>
+        <p>The NBA has recently surpassed 10-billion-dollars in revenue, marking a significant growth in interest for the sport of basketball. Due to
+            the immense financial incentives, NBA teams are constantly looking
+            for ways to improve their play and get an edge over their competitors.</p>
+        <p>This tool will compile data regarding various team statistics (such as
+            field goal percentage, opponent field goal percentage, shot selection
+            distributions, rebound differential, etc.) and demonstrate how they
+            contribute to winning. Specifically, the tool will allow users to
+            analyze the interactions between multiple attributes, and see the
+            statistical profiles of the most winning (and least winning) teams</p>
+        <p>This tool will be usable by NBA coaches and general managers
+            to determine areas of improvement for their teams, as specific teams’
+            statistics will be available upon a query for comparison purposes.
+            For example, a coach can see how their team’s opponent’s FG and
+            rebound rate compare to winning teams, as well as which is more
+            important to improve if they want a better record next year. This can
+            inform roster moves, coaching emphases, and playbook changes,
+            among other possible actions. Furthermore, if a team’s win rate
+            does not match the typical win rates of teams with similar statistics,
+            it suggests there is another, more pressing change that needs to be
+            emphasized. </p>
+
     </div>
 
     <div>
         <h2>Background</h2>
-        TODO: Add link to report, demo video, link to data etc. here  
+
+        <div>
+            <H3>Data</H3>
+            <p>The data being used for the visualization is from a Kaggle dataset
+                by Nathan Lauga, who scraped the data from the official NBA
+                website. This data is collected on a per-game basis by professional
+                scorekeepers and uploaded to the website postgame. The dataset
+                contains data on every individual game, including each player’s
+                statistical contributions as well as important team statistics. From
+                this, we have derived averages of each player’s per-game statistics
+                (such as points per game, assists per game, turnovers per game) and
+                compiled statistical totals (games played, minutes played, total field
+                goals made).</p>
+            <p>There exists little inherent bias as presented in the raw dataset.
+                As basic statistics are collected in their totality with no missing
+                values, there is little room for inherent bias; furthermore, there are
+                no ethical considerations to the sourcing of data. However, one must
+                consider the various imperfections and tradeoffs associated with
+                more advanced metrics. For example, player efficiency rating (PER)
+                disproportionately values shotmaking over every other metric, which
+                overvalues catch-and-shoot players while undervaluing shot creation
+                and non-scoring related aspects of the game. These advanced metrics
+                will be presented to users, however, as they are commonly used;
+                explanations of these stats will be available to explain potential
+                limitations and biases.</p>
+            <p>The datasets can be found at the following link: <a href="https://www.kaggle.com/datasets/nathanlauga/nba-games">https://www.kaggle.com/datasets/nathanlauga/nba-games</a></p>
+        </div>
+
+        
     </div>
 
     <div>
         <h2>Visualization</h2>
-        TODO: Build your visualization tool here  
-    </div>
-
-    <div>
-        <h2>Acknowledgements</h2>
-        TODO: Cite resources used here   
-    </div>
-
-
-    <div class="flex-container">
+        <div class="flex-container">
+            <div id="column1">
+                <h2></h2>
+                <div id="scattervis"></div>
+                <div id="histogram"></div>
+        
+            </div>
+            <div id="column2">
+                <label for="x-axis">Select the stat to be displayed on the x-axis.</label>
+                        <select name="x-axis" id="x-axis">
+                            <optgroup label="Total Stats">
+                                <option value="FG3A">3-Pointers Attempted</option>
+                                <option value="FG3M">3-Pointers Made</option>
+                                <option value="FGA">Field Goals Attempted</option>
+                                <option value="FGM">Field Goals Made</option>
+                                <option value="FTM">Free Throws Made</option>
+                                <option value="FTA">Free Throws Attempted</option>
+                                <option value="GP">Games Played</option>
+                                <!--<option value="PLUS_MINUS">Plus-Minus</option>-->
+                            </optgroup>
+                            <optgroup label="Averaged Stats">
+                                <option value="PTS">Points Per Game</option>
+                                <option value="FG3_PCT">3-Point Percentage</option>
+                                <option value="FG_PCT">Field Goal Percentage</option>
+                                <option value="FT_PCT">Free Throw Percentage</option>
+                                <option value="EFG">Effective Field Goal Percentage</option>
+                                <option value="OREB">Offensive Rebounds Per Game</option>
+                                <option value="DREB">Defensive Rebounds Per Game</option>
+                                <option value="REB">Rebounds Per Game</option>
+                                <option value="AST">Assists Per Game</option>
+                                <option value="STL">Steals Per Game</option>
+                                <option value="BLK">Blocks Per Game</option>
+                                <option value="TO">Turnovers Per Game</option>
+                                <option value="PF">Fouls Per Game</option>
+                            </optgroup>
+        
+                        </select><br><br>
+                <label for="y-axis">Select the stat to be displayed on the y-axis.</label>
+                        <select name="y-axis" id="y-axis">
+                            <optgroup label="Total Stats">
+                                <option value="FG3M">3-Pointers Made</option>
+                                <option value="FG3A">3-Pointers Attempted</option>
+                                <option value="FGA">Field Goals Attempted</option>
+                                <option value="FGM">Field Goals Made</option>
+                                <option value="FTM">Free Throws Made</option>
+                                <option value="FTA">Free Throws Attempted</option>
+                                <option value="GP">Games Played</option>
+                                <!--<option value="PLUS_MINUS">Plus-Minus</option>-->
+                            </optgroup>
+                            <optgroup label="Averaged Stats">
+                                <option value="PTS">Points Per Game</option>
+                                <option value="FG3_PCT">3-Point Percentage</option>
+                                <option value="FG_PCT">Field Goal Percentage</option>
+                                <option value="FT_PCT">Free Throw Percentage</option>
+                                <option value="EFG">Effective Field Goal Percentage</option>
+                                <option value="OREB">Offensive Rebounds Per Game</option>
+                                <option value="DREB">Defensive Rebounds Per Game</option>
+                                <option value="REB">Rebounds Per Game</option>
+                                <option value="AST">Assists Per Game</option>
+                                <option value="STL">Steals Per Game</option>
+                                <option value="BLK">Blocks Per Game</option>
+                                <option value="TO">Turnovers Per Game</option>
+                                <option value="PF">Fouls Per Game</option>
+                            </optgroup>
+                        </select><br><br>
+                    <button type = "button" id = "graphButton">Generate Charts</button>
+            </div><div class="flex-container">
     <div id="column1">
-        <h2>Sepal Length vs. Petal Length</h2>
+        <h2></h2>
         <div id="scattervis"></div>
-        <div id="histogram_x"></div>
+        <div id="histogram"></div>
 
     </div>
     <div id="column2">
@@ -101,6 +218,16 @@
                 </select><br><br>
             <button type = "button" id = "graphButton">Generate Charts</button>
     </div>
+    </div>
+
+    <div>
+        <h2>Acknowledgements</h2>
+        
+        
+    </div>
+
+
+    
   <script type="text/javascript" src="main.js"></script>
 
 </body>
