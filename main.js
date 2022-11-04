@@ -98,6 +98,7 @@ function userGenerateGraph() {
 //using two stat abbreviations, generate a graph
 function generateGraph(x, y) {
 	d3.csv("player_average.csv").then((data) => {
+		console.log(data);
 
 		//preparing x data and axis:
 		let x_data = Array(488);
@@ -108,7 +109,6 @@ function generateGraph(x, y) {
 					x_data[n] = parseFloat(data[n][x]);
 				}
 			}
-    console.log(x_data)
 
 		let x_axis_scale = d3.scaleLinear()
 							 .domain([0, (1.05 * Math.max(...x_data))])
@@ -181,13 +181,14 @@ function generateGraph(x, y) {
 		        .attr("font-size", "10px");
 
 		//adding y-axis title to scatterplot
-		SCATTERFRAME.append("text")
-						.attr("x", MARGINS.left)
-						.attr("y", FRAME_HEIGHT / 2)
-						.attr("font-size", "10px")
-						.attr("text-anchor", "middle")
-						.attr('transform', 'rotate(-90)')
-						.text(statFromAbbrev(y));
+		SCATTERFRAME.append("g")
+						.attr("transform",
+							"translate(" + (MARGINS.left / 2) + "," + (FRAME_HEIGHT / 2) + ")")
+						.append("text")
+							.attr("font-size", "10px")
+							.attr("text-anchor", "middle")
+							.attr('transform', 'rotate(-90)')
+							.text(statFromAbbrev(y));
 
 		//adding tooltip
 	 	const TOOLTIP = d3.select("#scattervis")
