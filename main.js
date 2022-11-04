@@ -120,6 +120,7 @@ function generateGraph(x, y) {
 		SCATTERFRAME.selectAll("circle").remove();
 		SCATTERFRAME.selectAll("g").remove();
 		SCATTERFRAME.selectAll("text").remove();
+		SCATTERFRAME.selectAll(".tooltip").remove();
 
 		//appending points 
 		let scatter = SCATTERFRAME.selectAll("circle")
@@ -147,7 +148,15 @@ function generateGraph(x, y) {
 		    .attr("transform", 
 		          "translate(" + MARGINS.left + "," + (VIS_HEIGHT + MARGINS.top) + ")")
 		    .call(d3.axisBottom(x_axis_scale).ticks(7))
-		        .attr("font-size", "20px");
+		        .attr("font-size", "12px");
+
+		//adding x-axis title to scatterplot
+		SCATTERFRAME.append("text")
+						.attr("x", FRAME_WIDTH / 2)
+						.attr("y", FRAME_HEIGHT)
+						.attr("font-size", "10px")
+						.attr("text-anchor", "middle")
+						.text(statFromAbbrev(x));
 
 
 		//adding y-axis to scatterplot
@@ -155,8 +164,16 @@ function generateGraph(x, y) {
 			.attr("transform",
 					"translate(" + MARGINS.left + "," + MARGINS.bottom + ")")
 			.call(d3.axisLeft(y_axis_scale).ticks(5))
-		        .attr("font-size", "20px");
+		        .attr("font-size", "10px");
 
+		//adding y-axis title to scatterplot
+		SCATTERFRAME.append("text")
+						.attr("x", MARGINS.left)
+						.attr("y", FRAME_HEIGHT / 2)
+						.attr("font-size", "10px")
+						.attr("text-anchor", "middle")
+						.attr('transform', 'rotate(-90)')
+						.text(statFromAbbrev(y));
 
 		//adding tooltip
 	 	const TOOLTIP = d3.select("#scattervis")
@@ -184,7 +201,7 @@ function generateGraph(x, y) {
 	 	function mouseleave(event, d) {
 	 		TOOLTIP.style("opacity", 0)
 	 				.style("left", 0 + "px")
-	 				.style("top", 0 + "px");;
+	 				.style("top", 0 + "px");
  		}
 
  		SCATTERFRAME.selectAll("circle")
