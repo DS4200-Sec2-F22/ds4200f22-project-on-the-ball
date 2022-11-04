@@ -20,13 +20,22 @@ const FG3M_SCALE = d3.scaleLinear()
 	    .range([0, VIS_HEIGHT]);
 
 
-//frame being used for sepal length vs. petal length scatterplot
+//frame being used for scatterplot
 const SCATTERFRAME = d3.select("#scattervis")
 				.append("svg")
 					.attr("height", FRAME_HEIGHT)
 					.attr("width", FRAME_WIDTH)
 					.attr("class", "frame");
 
+//frame being used for histogram
+const HISTOGRAM = d3.select("#histogram")
+        .append("svg")
+          .attr("height", FRAME_HEIGHT)
+          .attr("width", FRAME_WIDTH)
+          .attr("class", "frame")
+        .append("g")
+          .attr("transform",
+            "translate(" + MARGINS.left + "," + MARGINS.top + ")");
 
 //plotting user-added points
 document.getElementById("graphButton").addEventListener('click', userGenerateGraph);
@@ -99,6 +108,7 @@ function generateGraph(x, y) {
 					x_data[n] = parseFloat(data[n][x]);
 				}
 			}
+    console.log(x_data)
 
 		let x_axis_scale = d3.scaleLinear()
 							 .domain([0, (1.05 * Math.max(...x_data))])
@@ -120,6 +130,10 @@ function generateGraph(x, y) {
 		SCATTERFRAME.selectAll("circle").remove();
 		SCATTERFRAME.selectAll("g").remove();
 		SCATTERFRAME.selectAll("text").remove();
+
+    HISTOGRAM.selectAll("circle").remove();
+    HISTOGRAM.selectAll("g").remove();
+    HISTOGRAM.selectAll("text").remove();
 
 		//appending points 
 		let scatter = SCATTERFRAME.selectAll("circle")
@@ -192,6 +206,35 @@ function generateGraph(x, y) {
  			.on("mousemove", mousemove)
  			.on("mouseleave", mouseleave);
 
+
+    HISTOGRAM.append("g")
+        .attr("transform", "translate(0," + VIS_HEIGHT + ")")
+        .call(d3.axisBottom(x_axis_scale));
+
+    // set the parameters for the histogram
+    var histogram = d3.histogram()
+        .value(function(d) { return d[x]; })   // I need to give the vector of value
+        .domain(x_axis_scale.domain())  // then the domain of the graphic
+        .thresholds(x_axis_scale.ticks(70)); // then the numbers of bins
+
+    // And apply this function to data to get the bins
+    var bins = histogram(data);
+
+    // Y axis: scale and draw:
+    HISTOGRAM.append("g")
+        .call(d3.axisLeft(y_axis_scale));
+
+    // append the bar rectangles to the svg element
+    HISTOGRAM.selectAll("rect")
+        .data(bins)
+        .enter()
+        .append("rect")
+          .attr("x", 1)
+          .attr("transform", function(d) { return "translate(" + x_axis_scale(d.x0) + "," + y_axis_scale(d.length) + ")"; })
+          .attr("width", function(d) { return x_axis_scale(d.x1) - x_axis_scale(d.x0) -1 ; })
+          .attr("height", function(d) { return VIS_HEIGHT - y_axis_scale(d.length); })
+          .style("fill", "#69b3a2")
+
 /*
 
 
@@ -228,52 +271,52 @@ generateGraph('FG3A', 'FG3M')
 // HISTOGRAM
 //
 
-var margin = {top: 10, right: 30, bottom: 30, left: 40},
-    width = 460 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+// var margin = {top: 10, right: 30, bottom: 30, left: 40},
+//     width = 460 - margin.left - margin.right,
+//     height = 400 - margin.top - margin.bottom;
 
-var svg = d3.select("#histogram_x")
-  .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
+// var svg = d3.select("#histogram_x")
+//   .append("svg")
+//     .attr("width", width + margin.left + margin.right)
+//     .attr("height", height + margin.top + margin.bottom)
+//   .append("g")
+//     .attr("transform",
+//           "translate(" + margin.left + "," + margin.top + ")");
 
-d3.csv("player_average.csv", function(data) {
+// d3.csv("player_average.csv", function(data) {
 
-  // X axis: scale and draw:
-  var x = d3.scaleLinear()
-      .domain([0, d3.max(data, function(d) { return d.FGM; })])
-      .range([0, width]);
-  svg.append("g")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
+//   // X axis: scale and draw:
+//   var x = d3.scaleLinear()
+//       .domain([0, d3.max(data, function(d) { return d.FGM; })])
+//       .range([0, width]);
+//   svg.append("g")
+//       .attr("transform", "translate(0," + height + ")")
+//       .call(d3.axisBottom(x));
 
-  // set the parameters for the histogram
-  var histogram = d3.histogram()
-      .value(function(d) { return d.FGM; })   // I need to give the vector of value
-      .domain(x.domain())  // then the domain of the graphic
-      .thresholds(x.ticks(70)); // then the numbers of bins
+//   // set the parameters for the histogram
+//   var histogram = d3.histogram()
+//       .value(function(d) { return d.FGM; })   // I need to give the vector of value
+//       .domain(x.domain())  // then the domain of the graphic
+//       .thresholds(x.ticks(70)); // then the numbers of bins
 
-  // And apply this function to data to get the bins
-  var bins = histogram(data);
+//   // And apply this function to data to get the bins
+//   var bins = histogram(data);
 
-  // Y axis: scale and draw:
-  var y = d3.scaleLinear()
-      .range([height, 0]);
-      y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
-  svg.append("g")
-      .call(d3.axisLeft(y));
+//   // Y axis: scale and draw:
+//   var y = d3.scaleLinear()
+//       .range([height, 0]);
+//       y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
+//   svg.append("g")
+//       .call(d3.axisLeft(y));
 
-  // append the bar rectangles to the svg element
-  svg.selectAll("rect")
-      .data(bins)
-      .enter()
-      .append("rect")
-        .attr("x", 1)
-        .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
-        .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
-        .attr("height", function(d) { return height - y(d.length); })
-        .style("fill", "#69b3a2")
-});
+//   // append the bar rectangles to the svg element
+//   svg.selectAll("rect")
+//       .data(bins)
+//       .enter()
+//       .append("rect")
+//         .attr("x", 1)
+//         .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+//         .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+//         .attr("height", function(d) { return height - y(d.length); })
+//         .style("fill", "#69b3a2")
+// });
