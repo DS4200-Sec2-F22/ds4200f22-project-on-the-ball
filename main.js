@@ -1,6 +1,6 @@
 const FRAME_HEIGHT = 500;
 const FRAME_WIDTH = 600;
-const MARGINS = {left:50, right:50, top:25, bottom:25}
+const MARGINS = {left:70, right:70, top:50, bottom:50}
 
 const VIS_HEIGHT = FRAME_HEIGHT - MARGINS.top - MARGINS.bottom;
 const VIS_WIDTH = FRAME_WIDTH - MARGINS.left - MARGINS.right;
@@ -155,6 +155,7 @@ function generateGraph(x, y) {
 						.attr("x", FRAME_WIDTH / 2)
 						.attr("y", MARGINS.top)
 						.attr("text-anchor", "middle")
+						.style("font-weight", "bold")
 						.text(statFromAbbrev(x) + " vs. " + statFromAbbrev(y));
 
 		//adding x-axis to scatterplot
@@ -167,11 +168,10 @@ function generateGraph(x, y) {
 		//adding x-axis title to scatterplot
 		SCATTERFRAME.append("text")
 						.attr("x", FRAME_WIDTH / 2)
-						.attr("y", FRAME_HEIGHT)
-						.attr("font-size", "10px")
+						.attr("y", FRAME_HEIGHT - 5)
+						.attr("font-size", "15px")
 						.attr("text-anchor", "middle")
 						.text(statFromAbbrev(x));
-
 
 		//adding y-axis to scatterplot
 		SCATTERFRAME.append("g")
@@ -185,7 +185,7 @@ function generateGraph(x, y) {
 						.attr("transform",
 							"translate(" + (MARGINS.left / 2) + "," + (FRAME_HEIGHT / 2) + ")")
 						.append("text")
-							.attr("font-size", "10px")
+							.attr("font-size", "15px")
 							.attr("text-anchor", "middle")
 							.attr('transform', 'rotate(-90)')
 							.text(statFromAbbrev(y));
