@@ -141,6 +141,14 @@ p {
     fill: darkgreen;
 }
 
+.bar {
+    fill: #69b3a2;
+}
+
+.highlightedBar {
+    fill: orange;
+}
+
 circle:hover {
     fill: orange !important;
 }

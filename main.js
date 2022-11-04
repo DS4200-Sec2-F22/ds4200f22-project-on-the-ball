@@ -5,20 +5,10 @@ const MARGINS = {left:70, right:70, top:50, bottom:50}
 const VIS_HEIGHT = FRAME_HEIGHT - MARGINS.top - MARGINS.bottom;
 const VIS_WIDTH = FRAME_WIDTH - MARGINS.left - MARGINS.right;
 
+const HISTOGRAM_BIN_COUNT = 20;
 //
 // SCATTERPLOT
 //
-
-//x-scale for bar chart
-const FG3A_SCALE = d3.scaleLinear()
-  .domain([0, 800])
-  .range([0, (VIS_WIDTH)])
-
-//y-scale for bar chart
-const FG3M_SCALE = d3.scaleLinear()
-		.domain([0, 300])
-	    .range([0, VIS_HEIGHT]);
-
 
 //frame being used for scatterplot
 const SCATTERFRAME = d3.select("#scattervis")
@@ -125,14 +115,18 @@ function generateGraph(x, y) {
 		}
 		let y_axis_scale = d3.scaleLinear()
 							 .domain([0, (1.05 * Math.max(...y_data))])
-							 .range([(VIS_HEIGHT), 0])
+							 .range([(VIS_HEIGHT), 0]);
+
+		let y_axis_scale_histogram = d3.scaleLinear()
+							 .domain([0, 500])
+							 .range([0, (VIS_HEIGHT)]);
 
 		SCATTERFRAME.selectAll("circle").remove();
 		SCATTERFRAME.selectAll("g").remove();
 		SCATTERFRAME.selectAll("text").remove();
 		SCATTERFRAME.selectAll(".tooltip").remove();
 
-    HISTOGRAM.selectAll("circle").remove();
+    HISTOGRAM.selectAll("rect").remove();
     HISTOGRAM.selectAll("g").remove();
     HISTOGRAM.selectAll("text").remove();
 
@@ -196,29 +190,6 @@ function generateGraph(x, y) {
 	 							.attr("class", "tooltip")
 	 							.style("opacity", 0);
 
-		//tooltip behavior when mousing over a point
-	 	function mouseover(event, d) {
-	 		TOOLTIP.style("opacity", 1);
-	 	}
-
-	 	//tooltip behavior when moving mouse while on a point
-	 	function mousemove(event, d) {
-	 		TOOLTIP.html("Player Name: " + d.PLAYER_NAME 
-							+ "<br>Team: " + d.TEAM_ABBREVIATION
-							+ "<br>Position: " + d.START_POSITION
-							+ "<br>" + statFromAbbrev(x) + ": " + d[x]
-							+ "<br>" + statFromAbbrev(y) + ": " + d[y])
-	 			.style("left", (event.pageX + 5) + "px")
-	 			.style("top", (event.pageY - 50) + "px");
-	 	}
-
-	 	//tooltip behavior when moving mouse off of bar
-	 	function mouseleave(event, d) {
-	 		TOOLTIP.style("opacity", 0)
-	 				.style("left", 0 + "px")
-	 				.style("top", 0 + "px");
- 		}
-
  		SCATTERFRAME.selectAll("circle")
  			.on("mouseover", mouseover)
  			.on("mousemove", mousemove)
@@ -226,21 +197,22 @@ function generateGraph(x, y) {
 
 
     HISTOGRAM.append("g")
-        .attr("transform", "translate(0," + VIS_HEIGHT + ")")
-        .call(d3.axisBottom(x_axis_scale));
+        .attr("transform", "translate(0," + MARGINS.top + ")")
+        .call(d3.axisTop(x_axis_scale));
 
     // set the parameters for the histogram
-    var histogram = d3.histogram()
+    let histogram = d3.histogram()
         .value(function(d) { return d[x]; })   // I need to give the vector of value
         .domain(x_axis_scale.domain())  // then the domain of the graphic
-        .thresholds(x_axis_scale.ticks(70)); // then the numbers of bins
+        .thresholds(x_axis_scale.ticks(HISTOGRAM_BIN_COUNT)); // then the numbers of bins
 
     // And apply this function to data to get the bins
-    var bins = histogram(data);
+    let bins = histogram(data);
 
     // Y axis: scale and draw:
     HISTOGRAM.append("g")
-        .call(d3.axisLeft(y_axis_scale));
+    	.attr("transform", "translate(0," + MARGINS.top + ")")
+        .call(d3.axisLeft(y_axis_scale_histogram));
 
     // append the bar rectangles to the svg element
     HISTOGRAM.selectAll("rect")
@@ -248,11 +220,47 @@ function generateGraph(x, y) {
         .enter()
         .append("rect")
           .attr("x", 1)
-          .attr("transform", function(d) { return "translate(" + x_axis_scale(d.x0) + "," + y_axis_scale(d.length) + ")"; })
-          .attr("width", function(d) { return x_axis_scale(d.x1) - x_axis_scale(d.x0) -1 ; })
-          .attr("height", function(d) { return VIS_HEIGHT - y_axis_scale(d.length); })
-          .style("fill", "#69b3a2")
+          .attr("y", 1)
+          .attr("transform", function(d) { return "translate(" + x_axis_scale(d.x0) + "," + MARGINS.top + ")"; })
+          .attr("width", function(d) { return x_axis_scale(d.x1) - x_axis_scale(d.x0) - 1; })
+          .attr("height", function(d) { return y_axis_scale_histogram(d.length) ;})
+          .attr("x0", (d) => {return parseFloat(d.x0);})
+          .attr("x1", (d) => {return parseFloat(d.x1);})
+          .attr("class", "bar");
 
+
+
+     //behavior when mousing over a point
+	 function mouseover(event, d) {
+	 	TOOLTIP.style("opacity", 1);
+	 	xVal = d[x];
+	 	HISTOGRAM.selectAll("rect")
+	 				.each((data, i, bars) => {
+	 					bar = bars[i];
+	 					if (xVal > parseFloat(bar.getAttribute("x0")) && xVal < parseFloat(bar.getAttribute("x1"))) {
+	 						d3.select(bar).attr("class", "highlightedBar");
+	 					}
+		 		 	})
+	 }
+
+ 	//behavior when moving mouse while on a point
+ 	function mousemove(event, d) {
+ 		TOOLTIP.html("Player Name: " + d.PLAYER_NAME 
+						+ "<br>Team: " + d.TEAM_ABBREVIATION
+						+ "<br>Position: " + d.START_POSITION
+						+ "<br>" + statFromAbbrev(x) + ": " + d[x]
+						+ "<br>" + statFromAbbrev(y) + ": " + d[y])
+ 			.style("left", (event.pageX + 5) + "px")
+ 			.style("top", (event.pageY - 50) + "px");
+ 	}
+
+ 	//behavior when moving mouse off of bar
+ 	function mouseleave(event, d) {
+ 		TOOLTIP.style("opacity", 0)
+ 				.style("left", 0 + "px")
+ 				.style("top", 0 + "px");
+		d3.selectAll(".highlightedBar").attr("class", "bar");
+		}
 /*
 
 
