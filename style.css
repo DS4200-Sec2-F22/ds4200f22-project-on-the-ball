@@ -6,6 +6,10 @@ h1 {
     text-align: center;
 }
 
+p {
+    text-indent: 50px;
+}
+
 .flex-container {
   display: flex;
   flex-direction: row;
