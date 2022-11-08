@@ -1,9 +1,11 @@
-const FRAME_HEIGHT = 500;
-const FRAME_WIDTH = 600;
+const FRAME_HEIGHT = 450;
+const FRAME_WIDTH = 550;
 const MARGINS = {left:70, right:70, top:50, bottom:50}
 
 const VIS_HEIGHT = FRAME_HEIGHT - MARGINS.top - MARGINS.bottom;
 const VIS_WIDTH = FRAME_WIDTH - MARGINS.left - MARGINS.right;
+
+const BAR_HEIGHT = VIS_HEIGHT / 2;
 
 const HISTOGRAM_BIN_COUNT = 20;
 //
@@ -25,7 +27,7 @@ const HISTOGRAM = d3.select("#histogram")
           .attr("class", "frame")
         .append("g")
           .attr("transform",
-            "translate(" + MARGINS.left + "," + MARGINS.top + ")");
+            "translate(" + MARGINS.left + "," + 0 + ")");
 
 //plotting user-added points
 document.getElementById("graphButton").addEventListener('click', userGenerateGraph);
@@ -117,9 +119,6 @@ function generateGraph(x, y) {
 							 .domain([0, (1.05 * Math.max(...y_data))])
 							 .range([(VIS_HEIGHT), 0]);
 
-		let y_axis_scale_histogram = d3.scaleLinear()
-							 .domain([0, 500])
-							 .range([0, (VIS_HEIGHT)]);
 
 		SCATTERFRAME.selectAll("circle").remove();
 		SCATTERFRAME.selectAll("g").remove();
@@ -208,6 +207,21 @@ function generateGraph(x, y) {
 
     // And apply this function to data to get the bins
     let bins = histogram(data);
+
+    let maxBinSize = 0;
+
+    for (n = 0; n < bins.length; n++) {
+    	binSize = (bins[n].length);
+    	if (binSize > maxBinSize) {
+    		maxBinSize = binSize;
+    	}
+    }
+
+    console.log(maxBinSize);
+
+    let y_axis_scale_histogram = d3.scaleLinear()
+							 .domain([0, (maxBinSize * 1.05)])
+							 .range([0, (BAR_HEIGHT)]);
 
     // Y axis: scale and draw:
     HISTOGRAM.append("g")
