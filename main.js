@@ -8,6 +8,8 @@ const VIS_WIDTH = FRAME_WIDTH - MARGINS.left - MARGINS.right;
 const BAR_HEIGHT = VIS_HEIGHT / 2;
 
 const HISTOGRAM_BIN_COUNT = 20;
+
+const DATASET_SIZE = 488;
 //
 // SCATTERPLOT
 //
@@ -22,7 +24,7 @@ const SCATTERFRAME = d3.select("#scattervis")
 //frame being used for histogram
 const HISTOGRAM = d3.select("#histogram")
         .append("svg")
-          .attr("height", FRAME_HEIGHT)
+          .attr("height", FRAME_HEIGHT / 1.5)
           .attr("width", FRAME_WIDTH)
           .attr("class", "frame")
         .append("g")
@@ -80,6 +82,28 @@ function statFromAbbrev(abbrev_name) {
 	}
 }
 
+//calculating a player's percentile in a given stat compared to all other players
+function playerPercentile(player, attribute, data) {
+	let playerGreaterThan = 0;
+	for (n in data) {
+		if (Math.round(player[attribute] * 1000) > Math.round(data[n][attribute] * 1000)) {
+			playerGreaterThan++;
+		}
+	}
+	percentBetterThan = (playerGreaterThan / DATASET_SIZE);
+	percentileInt = Math.floor(percentBetterThan * 100)
+	if (percentileInt == 11 || percentileInt == 12 || percentileInt == 13) {
+		return percentileInt + "th";
+	} else if (percentileInt % 10 == 1) {
+		return percentileInt + "st";
+	} else if (percentileInt % 10 == 2) {
+		return percentileInt + "nd";
+	} else if (percentileInt % 10 == 3) {
+		return percentileInt + "th";
+	} else {
+		return percentileInt + "th";
+	}
+}
 
 function userGenerateGraph() {
 	let x = document.getElementById("x-axis").value;
@@ -93,7 +117,7 @@ function generateGraph(x, y) {
 		console.log(data);
 
 		//preparing x data and axis:
-		let x_data = Array(488);
+		let x_data = Array(DATASET_SIZE);
 		for (let n = 0; n < data.length; n++) {
 				if (isNaN(parseFloat(data[n][x]))) {
 					x_data[n] = 0.0;
@@ -125,6 +149,7 @@ function generateGraph(x, y) {
 		SCATTERFRAME.selectAll("text").remove();
 		SCATTERFRAME.selectAll(".tooltip").remove();
 
+
     HISTOGRAM.selectAll("rect").remove();
     HISTOGRAM.selectAll("g").remove();
     HISTOGRAM.selectAll("text").remove();
@@ -152,7 +177,7 @@ function generateGraph(x, y) {
 						.text(statFromAbbrev(x) + " vs. " + statFromAbbrev(y));
 
 		//adding x-axis to scatterplot
-		SCATTERFRAME.append("g")
+		let xAxis = SCATTERFRAME.append("g")
 		    .attr("transform", 
 		          "translate(" + MARGINS.left + "," + (VIS_HEIGHT + MARGINS.top) + ")")
 		    .call(d3.axisBottom(x_axis_scale).ticks(7))
@@ -167,7 +192,7 @@ function generateGraph(x, y) {
 						.text(statFromAbbrev(x));
 
 		//adding y-axis to scatterplot
-		SCATTERFRAME.append("g")
+		let yAxis = SCATTERFRAME.append("g")
 			.attr("transform",
 					"translate(" + MARGINS.left + "," + MARGINS.bottom + ")")
 			.call(d3.axisLeft(y_axis_scale).ticks(5))
@@ -217,8 +242,6 @@ function generateGraph(x, y) {
     	}
     }
 
-    console.log(maxBinSize);
-
     let y_axis_scale_histogram = d3.scaleLinear()
 							 .domain([0, (maxBinSize * 1.05)])
 							 .range([0, (BAR_HEIGHT)]);
@@ -240,33 +263,40 @@ function generateGraph(x, y) {
           .attr("height", function(d) { return y_axis_scale_histogram(d.length) ;})
           .attr("x0", (d) => {return parseFloat(d.x0);})
           .attr("x1", (d) => {return parseFloat(d.x1);})
+          .attr("items", (d) => {return d.length;})
           .attr("class", "bar");
-
 
 
      //behavior when mousing over a point
 	 function mouseover(event, d) {
+	 	let selectedBarSize = null;
 	 	TOOLTIP.style("opacity", 1);
 	 	xVal = d[x];
 	 	HISTOGRAM.selectAll("rect")
 	 				.each((data, i, bars) => {
 	 					bar = bars[i];
-	 					if (xVal > parseFloat(bar.getAttribute("x0")) && xVal < parseFloat(bar.getAttribute("x1"))) {
+	 					if (xVal >= parseFloat(bar.getAttribute("x0")) && xVal < parseFloat(bar.getAttribute("x1"))) {
 	 						d3.select(bar).attr("class", "highlightedBar");
+	 						selectedBarSize = bar.getAttribute("items");
 	 					}
 		 		 	})
+		TOOLTIP.html("<b>" + d.PLAYER_NAME
+						+ "<br>" + d.TEAM_ABBREVIATION + "</b>"
+						+ "<br>Position: " + d.START_POSITION
+						+ "<br><br>" + statFromAbbrev(x) + ": " + d[x]
+						+ "<br><ul><li>" + "Similar to: " + (selectedBarSize - 1) + " other players</li>" 
+						+ "<li>" + playerPercentile(d, x, data) + " percentile</li>"
+						+ "</ul>"
+						+ statFromAbbrev(y) + ": " + d[y]);
 	 }
+
 
  	//behavior when moving mouse while on a point
  	function mousemove(event, d) {
- 		TOOLTIP.html("Player Name: " + d.PLAYER_NAME 
-						+ "<br>Team: " + d.TEAM_ABBREVIATION
-						+ "<br>Position: " + d.START_POSITION
-						+ "<br>" + statFromAbbrev(x) + ": " + d[x]
-						+ "<br>" + statFromAbbrev(y) + ": " + d[y])
- 			.style("left", (event.pageX + 5) + "px")
+ 		TOOLTIP.style("left", (event.pageX + 5) + "px")
  			.style("top", (event.pageY - 50) + "px");
  	}
+
 
  	//behavior when moving mouse off of bar
  	function mouseleave(event, d) {
@@ -274,8 +304,56 @@ function generateGraph(x, y) {
  				.style("left", 0 + "px")
  				.style("top", 0 + "px");
 		d3.selectAll(".highlightedBar").attr("class", "bar");
+	}
+
+	// Add a clipPath: everything out of this area won't be drawn.
+	  let clip = SCATTERFRAME.append("clipPath")
+	      .attr("id", "clip")
+	      .append("rect")
+	      .attr("width", VIS_WIDTH + 5)
+	      .attr("height", VIS_HEIGHT + 5)
+	      .attr("transform", "translate(" + (MARGINS.left - 5) + "," + (MARGINS.top) + ")");
+
+
+	      //add brushing
+	      	brush = HISTOGRAM.call(d3.brushX()                 
+	      	      .extent([[0, MARGINS.top / 1.5], [VIS_WIDTH, VIS_HEIGHT / 1.5]])
+	      	      .on("end", updateChart)
+	      	      );
+
+	// Function that is triggered when brushing is performed
+	function updateChart() {
+			x_axis_scale.domain([0, (1.05 * Math.max(...x_data))]);
+			extent = d3.brushSelection(this);
+			// If selection exists, update X axis domain
+			    if (extent) {
+			    	zoomMin = (extent[0]);
+			    	zoomMax = (extent[1]);
+			    	x_axis_scale.domain([x_axis_scale.invert(zoomMin), x_axis_scale.invert(zoomMax)]);
+			    }
+
+			    // Update axis and circle position
+			    xAxis.transition().duration(1000).call(d3.axisBottom(x_axis_scale).ticks(6));
+			    d3.selectAll("circle")
+				    .transition().duration(1000)
+				    .attr("cx", function(d) {
+				    	return x_axis_scale(d[x]) + MARGINS.left;
+				    })
+				    .attr("cy", function(d) {
+				    	return y_axis_scale(d[y]) + MARGINS.bottom;})
+				    .attr("clip-path", "url(#clip)") // clip the points
+
 		}
 /*
+
+// Add a clipPath: everything out of this area won't be drawn.
+  var clip = Svg.append("defs").append("svg:clipPath")
+      .attr("id", "clip")
+      .append("svg:rect")
+      .attr("width", width )
+      .attr("height", height )
+      .attr("x", 0)
+      .attr("y", 0);
 
 
 		//add brushing
