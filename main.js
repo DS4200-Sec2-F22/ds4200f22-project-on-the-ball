@@ -44,6 +44,9 @@ const YHISTOGRAM = d3.select("#Yhistogram")
           .attr("transform",
             "translate(" + 0 + "," + MARGINS.top + ")");
 
+//frame being used for scatterplot
+const PLAYERFRAME = d3.select("#playerframe");
+
 //plotting user-added points
 document.getElementById("graphButton").addEventListener('click', userGenerateGraph);
 
@@ -231,10 +234,6 @@ function generateGraph(x, y) {
 	 							.attr("class", "tooltip")
 	 							.style("opacity", 0);
 
- 		SCATTERFRAME.selectAll("circle")
- 			.on("mouseover", mouseover)
- 			.on("mousemove", mousemove)
- 			.on("mouseleave", mouseleave);
 
 //X-AXIS HISTOGRAM ENCODING
 
@@ -342,6 +341,20 @@ function generateGraph(x, y) {
 
           //IN PROGRESS COMPLETE
 
+    // MOUSE EVENT HANDLING
+    scatterMouseHandler();
+
+    //HANDLER FOR BRUSHING
+    brushHandler();
+
+
+//contains handling for mousing over and clicking points on the scatterframe
+function scatterMouseHandler() {
+	   SCATTERFRAME.selectAll("circle")
+    	.on("mouseover", mouseover)
+    	.on("click", click)
+    	.on("mousemove", mousemove)
+    	.on("mouseleave", mouseleave);
 
     //behavior when mousing over a point
 	 function mouseover(event, d) {
@@ -383,6 +396,14 @@ function generateGraph(x, y) {
  			.style("top", (event.pageY - 50) + "px");
  	}
 
+ 	function click(event, d) {
+ 		PLAYERFRAME.selectAll("*").remove;
+ 		PLAYERFRAME.html("<b>" + d.PLAYER_NAME 
+ 						+ "<br>" +  d.TEAM_ABBREVIATION + "</b>"
+						+ "<br>Position: " + d.START_POSITION
+						+ "<br><br>Points per Game: " + d.PTS);
+ 	}
+
 
  	//behavior when moving mouse off of bar
  	function mouseleave(event, d) {
@@ -391,7 +412,9 @@ function generateGraph(x, y) {
  				.style("top", 0 + "px");
 		d3.selectAll(".highlightedBar").attr("class", "bar");
 	}
+}
 
+function brushHandler() {
 	// Add a clipPath: everything out of this area won't be drawn.
 	  let clip = SCATTERFRAME.append("clipPath")
 	      .attr("id", "clip")
@@ -464,8 +487,12 @@ function generateGraph(x, y) {
 				    .attr("cy", function(d) {
 				    	return y_axis_scale(d[y]) + MARGINS.bottom;})
 				    .attr("clip-path", "url(#clip)") // clip the points
-
 		}
+
+
+}
+
+
 /*
 
 // Add a clipPath: everything out of this area won't be drawn.
@@ -505,61 +532,4 @@ function generateGraph(x, y) {
 }
 
 generateGraph('FG3A', 'FG3M')
-
-
-//
-// XHISTOGRAM
-//
-
-// var margin = {top: 10, right: 30, bottom: 30, left: 40},
-//     width = 460 - margin.left - margin.right,
-//     height = 400 - margin.top - margin.bottom;
-
-// var svg = d3.select("#histogram_x")
-//   .append("svg")
-//     .attr("width", width + margin.left + margin.right)
-//     .attr("height", height + margin.top + margin.bottom)
-//   .append("g")
-//     .attr("transform",
-//           "translate(" + margin.left + "," + margin.top + ")");
-
-// d3.csv("player_average.csv", function(data) {
-
-//   // X axis: scale and draw:
-//   var x = d3.scaleLinear()
-//       .domain([0, d3.max(data, function(d) { return d.FGM; })])
-//       .range([0, width]);
-//   svg.append("g")
-//       .attr("transform", "translate(0," + height + ")")
-//       .call(d3.axisBottom(x));
-
-//   // set the parameters for the Xhistogram
-//   var Xhistogram = d3.Xhistogram()
-//       .value(function(d) { return d.FGM; })   // I need to give the vector of value
-//       .domain(x.domain())  // then the domain of the graphic
-//       .thresholds(x.ticks(70)); // then the numbers of bins
-
-//   // And apply this function to data to get the bins
-//   var bins = Xhistogram(data);
-
-//   // Y axis: scale and draw:
-//   var y = d3.scaleLinear()
-//       .range([height, 0]);
-//       y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
-//   svg.append("g")
-//       .call(d3.axisLeft(y));
-
-//   // append the bar rectangles to the svg element
-//   svg.selectAll("rect")
-//       .data(bins)
-//       .enter()
-//       .append("rect")
-//         .attr("x", 1)
-//         .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
-//         .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
-//         .attr("height", function(d) { return height - y(d.length); })
-//         .style("fill", "#69b3a2")
-
-
-// });
 

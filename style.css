@@ -75,7 +75,8 @@ p {
 }
 
 #court {
-    width: 400%;
+    max-width: 50%;
+    height: auto;
     margin-right: 20px;
 }
 
@@ -128,7 +129,23 @@ circle:hover {
   padding: 5px;
 }
 
+#visColumns {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
 #column1 {
     flex-direction: column;
     align-items: flex-end;
+}
+
+#column2 {
+    margin-top: 5%;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#dropdowns {
+    font-size: 15px;
+
 }

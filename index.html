@@ -95,7 +95,7 @@
 
     <div id="visDiv">
         <h2>Visualization</h2>
-        <div class="flex-container">
+        <div id="visColumns" class="flex-container">
             <div id="column1" class="flex-container">
                 <h2></h2>
                 <div id="row1" class="flex-container">
@@ -105,65 +105,72 @@
                 <div id="Xhistogram"></div>
         
             </div>
-            <div id="column2">
-                <label for="x-axis">Select the stat to be displayed on the x-axis.</label>
-                        <select name="x-axis" id="x-axis">
-                            <optgroup label="Total Stats">
-                                <option value="FG3A">3-Pointers Attempted</option>
-                                <option value="FG3M">3-Pointers Made</option>
-                                <option value="FGA">Field Goals Attempted</option>
-                                <option value="FGM">Field Goals Made</option>
-                                <option value="FTM">Free Throws Made</option>
-                                <option value="FTA">Free Throws Attempted</option>
-                                <option value="GP">Games Played</option>
-                                <!--<option value="PLUS_MINUS">Plus-Minus</option>-->
-                            </optgroup>
-                            <optgroup label="Averaged Stats">
-                                <option value="PTS">Points Per Game</option>
-                                <option value="FG3_PCT">3-Point Percentage</option>
-                                <option value="FG_PCT">Field Goal Percentage</option>
-                                <option value="FT_PCT">Free Throw Percentage</option>
-                                <option value="EFG">Effective Field Goal Percentage</option>
-                                <option value="OREB">Offensive Rebounds Per Game</option>
-                                <option value="DREB">Defensive Rebounds Per Game</option>
-                                <option value="REB">Rebounds Per Game</option>
-                                <option value="AST">Assists Per Game</option>
-                                <option value="STL">Steals Per Game</option>
-                                <option value="BLK">Blocks Per Game</option>
-                                <option value="TO">Turnovers Per Game</option>
-                                <option value="PF">Fouls Per Game</option>
-                            </optgroup>
-        
-                        </select><br><br>
-                <label for="y-axis">Select the stat to be displayed on the y-axis.</label>
-                        <select name="y-axis" id="y-axis">
-                            <optgroup label="Total Stats">
-                                <option value="FG3M">3-Pointers Made</option>
-                                <option value="FG3A">3-Pointers Attempted</option>
-                                <option value="FGA">Field Goals Attempted</option>
-                                <option value="FGM">Field Goals Made</option>
-                                <option value="FTM">Free Throws Made</option>
-                                <option value="FTA">Free Throws Attempted</option>
-                                <option value="GP">Games Played</option>
-                                <!--<option value="PLUS_MINUS">Plus-Minus</option>-->
-                            </optgroup>
-                            <optgroup label="Averaged Stats">
-                                <option value="PTS">Points Per Game</option>
-                                <option value="FG3_PCT">3-Point Percentage</option>
-                                <option value="FG_PCT">Field Goal Percentage</option>
-                                <option value="FT_PCT">Free Throw Percentage</option>
-                                <option value="EFG">Effective Field Goal Percentage</option>
-                                <option value="OREB">Offensive Rebounds Per Game</option>
-                                <option value="DREB">Defensive Rebounds Per Game</option>
-                                <option value="REB">Rebounds Per Game</option>
-                                <option value="AST">Assists Per Game</option>
-                                <option value="STL">Steals Per Game</option>
-                                <option value="BLK">Blocks Per Game</option>
-                                <option value="TO">Turnovers Per Game</option>
-                                <option value="PF">Fouls Per Game</option>
-                            </optgroup>
-                        </select><br><br>
-                    <button type = "button" id = "graphButton">Generate Charts</button>
+            <div id="column2" class="flex-container">
+                <div id="dropdowns">
+                    <label for="x-axis">Select the stat to be displayed on the x-axis.</label><br>
+                            <select name="x-axis" id="x-axis">
+                                <optgroup label="Total Stats">
+                                    <option value="FG3A">3-Pointers Attempted</option>
+                                    <option value="FG3M">3-Pointers Made</option>
+                                    <option value="FGA">Field Goals Attempted</option>
+                                    <option value="FGM">Field Goals Made</option>
+                                    <option value="FTM">Free Throws Made</option>
+                                    <option value="FTA">Free Throws Attempted</option>
+                                    <option value="GP">Games Played</option>
+                                    <!--<option value="PLUS_MINUS">Plus-Minus</option>-->
+                                </optgroup>
+                                <optgroup label="Averaged Stats">
+                                    <option value="PTS">Points Per Game</option>
+                                    <option value="FG3_PCT">3-Point Percentage</option>
+                                    <option value="FG_PCT">Field Goal Percentage</option>
+                                    <option value="FT_PCT">Free Throw Percentage</option>
+                                    <option value="EFG">Effective Field Goal Percentage</option>
+                                    <option value="OREB">Offensive Rebounds Per Game</option>
+                                    <option value="DREB">Defensive Rebounds Per Game</option>
+                                    <option value="REB">Rebounds Per Game</option>
+                                    <option value="AST">Assists Per Game</option>
+                                    <option value="STL">Steals Per Game</option>
+                                    <option value="BLK">Blocks Per Game</option>
+                                    <option value="TO">Turnovers Per Game</option>
+                                    <option value="PF">Fouls Per Game</option>
+                                </optgroup>
+            
+                            </select><br><br>
+                    <label for="y-axis">Select the stat to be displayed on the y-axis.</label><br>
+                            <select name="y-axis" id="y-axis">
+                                <optgroup label="Total Stats">
+                                    <option value="FG3M">3-Pointers Made</option>
+                                    <option value="FG3A">3-Pointers Attempted</option>
+                                    <option value="FGA">Field Goals Attempted</option>
+                                    <option value="FGM">Field Goals Made</option>
+                                    <option value="FTM">Free Throws Made</option>
+                                    <option value="FTA">Free Throws Attempted</option>
+                                    <option value="GP">Games Played</option>
+                                    <!--<option value="PLUS_MINUS">Plus-Minus</option>-->
+                                </optgroup>
+                                <optgroup label="Averaged Stats">
+                                    <option value="PTS">Points Per Game</option>
+                                    <option value="FG3_PCT">3-Point Percentage</option>
+                                    <option value="FG_PCT">Field Goal Percentage</option>
+                                    <option value="FT_PCT">Free Throw Percentage</option>
+                                    <option value="EFG">Effective Field Goal Percentage</option>
+                                    <option value="OREB">Offensive Rebounds Per Game</option>
+                                    <option value="DREB">Defensive Rebounds Per Game</option>
+                                    <option value="REB">Rebounds Per Game</option>
+                                    <option value="AST">Assists Per Game</option>
+                                    <option value="STL">Steals Per Game</option>
+                                    <option value="BLK">Blocks Per Game</option>
+                                    <option value="TO">Turnovers Per Game</option>
+                                    <option value="PF">Fouls Per Game</option>
+                                </optgroup>
+                            </select><br><br>
+                        <button type = "button" id = "graphButton">Generate Charts</button>
+                    </div><br><br>
+                <div id="playerprofile">
+                    <br><br>
+                    <h3>Player Profile:</h3>
+                    <div id="playerframe"></div>
+                </div>
             </div>
         </div>
     </div>
