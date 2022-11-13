@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
+/*
+GENERAL WEBSITE FORMATTING
+*/
+
 * {
     margin-top: 0;
 }
@@ -7,18 +11,26 @@
 
 body {
     font-family: Roboto;
-    background-image: linear-gradient(white,  rgb(225, 255, 255)); /*, rgba(255, 240, 255, 0.8)*/
-    margin-left: 5%;
-    margin-right: 5%;
+    background-image: linear-gradient(white,  rgb(235, 252, 255)); /*, rgba(255, 240, 255, 0.8)*/
     text-align: justify;
 }
 
 .header {
     padding-top: 5px;
     padding-bottom: 0px;
+    margin-left: 0%;
+    margin-right: 0%;
+    margin-bottom: 10px;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
     color: black;
+    background-image: linear-gradient(white, lightskyblue), url(topbar.png); /*, rgba(255, 240, 255, 0.8)*/
+    background-size: 1500px 200px;
+    background-blend-mode: lighten;
+}
+
+#topbar {
+    justify-content: center;
 }
 
 #headerText {
@@ -58,137 +70,33 @@ p {
   border-width: 5px;
 }
 
-#topbar {
-    justify-content: center;
+#data-background {
+    margin-top: 40px;
+}
+
+#court {
+    width: 400%;
+    margin-right: 20px;
 }
 
 #textDiv {
-
+    margin-left: 5%;
+    margin-right: 5%;
 }
 
 #visDiv {
-
+    margin-left: 5%;
+    margin-right: 5%;
 }
 
-.MIN {
-    fill: rgb(12, 35, 64);
+#image-credits {
+    font-size: 15px;
 }
 
-.MIA {
-    fill: rgb(152, 0, 46);
-}
 
-.CLE {
-    fill: rgb(134, 0, 56);
-}
-
-.CHI {
-    fill: rgb(206, 17, 65);
-}
-
-.IND {
-    fill: rgb(253, 187, 48);
-}
-
-.SAS {
-    fill: rgb(196, 206, 211);
-}
-
-.MIL {
-    fill: rgb(0, 71, 27);
-}
-
-.GSW {
-    fill: rgb(29, 66, 138);
-}
-
-.TOR {
-    fill: rgb(206, 17, 65);
-}
-
-.DEN {
-    fill: rgb(13, 34, 64);
-}
-
-.SAC {
-    fill: rgb(91,43,130);
-}
-
-.UTA {
-    fill: rgb();
-}
-
-.WAS {
-
-}
-
-.POR {
-
-}
-
-.ORL {
-
-}
-
-.LAC {
-
-}
-
-.ATL {
-
-}
-
-.DET {
-
-}
-
-.BOS {
-
-}
-
-.DAL {
-
-}
-
-.HOU {
-
-}
-
-.NYK {
-
-}
-
-.MEM {
-
-}
-
-.CHA {
-
-}
-
-.NOP {
-
-}
-
-.PHX {
-
-}
-
-.LAL {
-
-}
-
-.BKN {
-
-}
-
-.PHI {
-
-}
-
-.OKC {
-
-}
+/*
+GRAPH FORMATTING
+*/
 
 .point {
     fill: darkgreen;
@@ -218,4 +126,9 @@ circle:hover {
   border-width: 2px;
   border-radius: 5px;
   padding: 5px;
+}
+
+#column1 {
+    flex-direction: column;
+    align-items: flex-end;
 }

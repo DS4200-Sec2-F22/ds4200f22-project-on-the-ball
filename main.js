@@ -7,6 +7,9 @@ const VIS_WIDTH = FRAME_WIDTH - MARGINS.left - MARGINS.right;
 
 const BAR_HEIGHT = VIS_HEIGHT / 2;
 
+const BAR_WIDTH = VIS_WIDTH / 2;
+
+
 const HISTOGRAM_BIN_COUNT = 20;
 
 const DATASET_SIZE = 488;
@@ -21,8 +24,8 @@ const SCATTERFRAME = d3.select("#scattervis")
 					.attr("width", FRAME_WIDTH)
 					.attr("class", "frame");
 
-//frame being used for histogram
-const HISTOGRAM = d3.select("#histogram")
+//frame being used for Xhistogram
+const XHISTOGRAM = d3.select("#Xhistogram")
         .append("svg")
           .attr("height", FRAME_HEIGHT / 1.5)
           .attr("width", FRAME_WIDTH)
@@ -30,6 +33,16 @@ const HISTOGRAM = d3.select("#histogram")
         .append("g")
           .attr("transform",
             "translate(" + MARGINS.left + "," + 0 + ")");
+
+//frame being used for Xhistogram
+const YHISTOGRAM = d3.select("#Yhistogram")
+        .append("svg")
+          .attr("height", FRAME_HEIGHT)
+          .attr("width", FRAME_WIDTH / 2)
+          .attr("class", "frame")
+        .append("g")
+          .attr("transform",
+            "translate(" + 0 + "," + MARGINS.top + ")");
 
 //plotting user-added points
 document.getElementById("graphButton").addEventListener('click', userGenerateGraph);
@@ -59,25 +72,25 @@ function statFromAbbrev(abbrev_name) {
 		case "EFG":
 			return "Effective Field Goal Percentage";
 		case "OREB":
-			return "Offensive Rebounds";
+			return "Offensive Rebounds per Game";
 		case "DREB":
-			return "Defensive Rebounds";
+			return "Defensive Rebounds per Game";
 		case "REB":
-			return "Rebounds";
+			return "Rebounds per Game";
 		case "AST":
-			return "Assists";
+			return "Assists per Game";
 		case "STL":
-			return "Steals";
+			return "Steals per Game";
 		case "BLK":
-			return "Blocks";
+			return "Blocks per Game";
 		case "TO":
-			return "Turnovers";
+			return "Turnovers per Game";
 		case "PF":
-			return "Fouls";
+			return "Fouls per Game";
 		case "PTS":
-			return "Points";
+			return "Points per Game";
 		case "PLUS_MINUS":
-			return "Plus-Minus";
+			return "Total Plus-Minus";
 
 	}
 }
@@ -150,9 +163,13 @@ function generateGraph(x, y) {
 		SCATTERFRAME.selectAll(".tooltip").remove();
 
 
-    HISTOGRAM.selectAll("rect").remove();
-    HISTOGRAM.selectAll("g").remove();
-    HISTOGRAM.selectAll("text").remove();
+    XHISTOGRAM.selectAll("rect").remove();
+    XHISTOGRAM.selectAll("g").remove();
+    XHISTOGRAM.selectAll("text").remove();
+
+    YHISTOGRAM.selectAll("rect").remove();
+    YHISTOGRAM.selectAll("g").remove();
+    YHISTOGRAM.selectAll("text").remove();
 
 		//appending points 
 		let scatter = SCATTERFRAME.selectAll("circle")
@@ -219,19 +236,20 @@ function generateGraph(x, y) {
  			.on("mousemove", mousemove)
  			.on("mouseleave", mouseleave);
 
+//X-AXIS HISTOGRAM ENCODING
 
-    HISTOGRAM.append("g")
+    XHISTOGRAM.append("g")
         .attr("transform", "translate(0," + MARGINS.top + ")")
         .call(d3.axisTop(x_axis_scale));
 
-    // set the parameters for the histogram
-    let histogram = d3.histogram()
+    // set the parameters for the Xhistogram
+    let Xhistogram = d3.histogram()
         .value(function(d) { return d[x]; })   // I need to give the vector of value
         .domain(x_axis_scale.domain())  // then the domain of the graphic
         .thresholds(x_axis_scale.ticks(HISTOGRAM_BIN_COUNT)); // then the numbers of bins
 
     // And apply this function to data to get the bins
-    let bins = histogram(data);
+    let bins = Xhistogram(data);
 
     let maxBinSize = 0;
 
@@ -247,12 +265,12 @@ function generateGraph(x, y) {
 							 .range([0, (BAR_HEIGHT)]);
 
     // Y axis: scale and draw:
-    HISTOGRAM.append("g")
+    XHISTOGRAM.append("g")
     	.attr("transform", "translate(0," + MARGINS.top + ")")
         .call(d3.axisLeft(y_axis_scale_histogram));
 
     // append the bar rectangles to the svg element
-    HISTOGRAM.selectAll("rect")
+    XHISTOGRAM.selectAll("rect")
         .data(bins)
         .enter()
         .append("rect")
@@ -267,29 +285,97 @@ function generateGraph(x, y) {
           .attr("class", "bar");
 
 
-     //behavior when mousing over a point
+	 //IN PROGRESS: Y-AXIS HISTOGRAM ENCODING
+
+	YHISTOGRAM.append("g")
+        .attr("transform", "translate(" + (VIS_WIDTH / 2) + "," + 0 + ")")
+        .call(d3.axisRight(y_axis_scale));
+
+    // set the parameters for the Xhistogram
+    let Yhistogram = d3.histogram()
+        .value(function(d) { return d[y]; })   // I need to give the vector of value
+        .domain(y_axis_scale.domain())  // then the domain of the graphic
+        .thresholds(y_axis_scale.ticks(HISTOGRAM_BIN_COUNT)); // then the numbers of bins
+
+    // And apply this function to data to get the bins
+    let Ybins = Yhistogram(data);
+
+    let maxYBinSize = 0;
+
+    for (n = 0; n < Ybins.length; n++) {
+    	binSize = (Ybins[n].length);
+    	if (binSize > maxYBinSize) {
+    		maxYBinSize = binSize;
+    	}
+    }
+
+    let x_axis_scale_histogram = d3.scaleLinear()
+							 .domain([0, (maxYBinSize * 1.05)])
+							 .range([(BAR_WIDTH), 0]);
+
+	let y_histogram_bar_width = d3.scaleLinear()
+							 .domain([0, (maxYBinSize * 1.05)])
+							 .range([0, BAR_WIDTH]);
+
+    // X axis: scale and draw:
+    YHISTOGRAM.append("g")
+    	.attr("transform", "translate(0," + VIS_HEIGHT + ")")
+        .call(d3.axisBottom(x_axis_scale_histogram));
+
+
+
+   // append the bar rectangles to the svg element
+   YHISTOGRAM.selectAll("rect")
+       .data(Ybins)
+       .enter()
+       .append("rect")
+         .attr("x", 1)
+         .attr("y", 1)
+         .attr("transform", function(d) { return "translate(" + x_axis_scale_histogram(d.length) +"," +  y_axis_scale(d.x1) + ")"; })
+         .attr("width", function(d) { return y_histogram_bar_width(d.length) - 1;})
+         .attr("height", function(d) { return y_axis_scale(d.x0) - y_axis_scale(d.x1) - 1;})
+         .attr("x0", (d) => {return parseFloat(d.x0);})
+         .attr("x1", (d) => {return parseFloat(d.x1);})
+         .attr("items", (d) => {return d.length;})
+         .attr("class", "bar");
+
+
+          //IN PROGRESS COMPLETE
+
+
+    //behavior when mousing over a point
 	 function mouseover(event, d) {
-	 	let selectedBarSize = null;
+	 	let selectedXBarSize = null;
+	 	let selectedYBarSize = null;
 	 	TOOLTIP.style("opacity", 1);
 	 	xVal = d[x];
-	 	HISTOGRAM.selectAll("rect")
+	 	yVal = d[y];
+	 	XHISTOGRAM.selectAll("rect")
 	 				.each((data, i, bars) => {
 	 					bar = bars[i];
 	 					if (xVal >= parseFloat(bar.getAttribute("x0")) && xVal < parseFloat(bar.getAttribute("x1"))) {
 	 						d3.select(bar).attr("class", "highlightedBar");
-	 						selectedBarSize = bar.getAttribute("items");
+	 						selectedXBarSize = bar.getAttribute("items");
+	 					}
+		 		 	})
+		YHISTOGRAM.selectAll("rect")
+	 				.each((data, i, bars) => {
+	 					bar = bars[i];
+	 					if (yVal >= parseFloat(bar.getAttribute("x0")) && yVal < parseFloat(bar.getAttribute("x1"))) {
+	 						d3.select(bar).attr("class", "highlightedBar");
+	 						selectedYBarSize = bar.getAttribute("items");
 	 					}
 		 		 	})
 		TOOLTIP.html("<b>" + d.PLAYER_NAME
 						+ "<br>" + d.TEAM_ABBREVIATION + "</b>"
 						+ "<br>Position: " + d.START_POSITION
-						+ "<br><br>" + statFromAbbrev(x) + ": " + d[x]
-						+ "<br><ul><li>" + "Similar to: " + (selectedBarSize - 1) + " other players</li>" 
+						+ "<br><br>" + statFromAbbrev(x) + ": " + xVal
+						+ "<br><ul><li>" + "Similar to: " + (selectedXBarSize - 1) + " other player(s)</li>" 
 						+ "<li>" + playerPercentile(d, x, data) + " percentile</li>"
-						+ "</ul>"
-						+ statFromAbbrev(y) + ": " + d[y]);
+						+ "</ul>" + statFromAbbrev(y) + ": " + yVal 
+						+ "<br><ul><li>" + "Similar to: " + (selectedYBarSize - 1) + " other player(s)</li>" 
+						+ "<li>" + playerPercentile(d, y, data) + " percentile</li>")
 	 }
-
 
  	//behavior when moving mouse while on a point
  	function mousemove(event, d) {
@@ -312,28 +398,64 @@ function generateGraph(x, y) {
 	      .append("rect")
 	      .attr("width", VIS_WIDTH + 5)
 	      .attr("height", VIS_HEIGHT + 5)
-	      .attr("transform", "translate(" + (MARGINS.left - 5) + "," + (MARGINS.top) + ")");
+	      .attr("transform", "translate(" + (MARGINS.left) + "," + (MARGINS.top) + ")");
 
 
 	      //add brushing
-	      	brush = HISTOGRAM.call(d3.brushX()                 
+	      	xbrush = (d3.brushX()                 
 	      	      .extent([[0, MARGINS.top / 1.5], [VIS_WIDTH, VIS_HEIGHT / 1.5]])
 	      	      .on("end", updateChart)
 	      	      );
 
+	      	xBrushFrame = XHISTOGRAM.append("g")
+							  	.attr("class", "brushX")
+					  			.call(xbrush);
+
+
+	      	ybrush = (d3.brushY()                 
+	      	      .extent([[MARGINS.left / 2, 0], [VIS_WIDTH / 2, VIS_HEIGHT]])
+	      	      .on("end", updateChart)
+	      	      );
+
+	      	yBrushFrame = YHISTOGRAM.append("g")
+							  	.attr("class", "brushY")
+					  			.call(ybrush);
+
 	// Function that is triggered when brushing is performed
 	function updateChart() {
+			//x-brush handling
 			x_axis_scale.domain([0, (1.05 * Math.max(...x_data))]);
-			extent = d3.brushSelection(this);
+			x_extent = d3.brushSelection(xBrushFrame.node());
 			// If selection exists, update X axis domain
-			    if (extent) {
-			    	zoomMin = (extent[0]);
-			    	zoomMax = (extent[1]);
+			    if (x_extent) {
+			    	zoomMin = (x_extent[0]);
+			    	zoomMax = (x_extent[1]);
 			    	x_axis_scale.domain([x_axis_scale.invert(zoomMin), x_axis_scale.invert(zoomMax)]);
 			    }
 
 			    // Update axis and circle position
 			    xAxis.transition().duration(1000).call(d3.axisBottom(x_axis_scale).ticks(6));
+			    d3.selectAll("circle")
+				    .transition().duration(1000)
+				    .attr("cx", function(d) {
+				    	return x_axis_scale(d[x]) + MARGINS.left;
+				    })
+				    .attr("cy", function(d) {
+				    	return y_axis_scale(d[y]) + MARGINS.bottom;})
+				    .attr("clip-path", "url(#clip)") // clip the points
+
+			//y-brush handling
+			y_axis_scale.domain([0, (1.05 * Math.max(...y_data))]);
+			y_extent = d3.brushSelection(yBrushFrame.node());
+			// If selection exists, update X axis domain
+			    if (y_extent) {
+			    	zoomMin = (y_extent[1]);
+			    	zoomMax = (y_extent[0]);
+			    	y_axis_scale.domain([y_axis_scale.invert(zoomMin), y_axis_scale.invert(zoomMax)]);
+			    }
+
+			    // Update axis and circle position
+			    yAxis.transition().duration(1000).call(d3.axisLeft(y_axis_scale).ticks(6));
 			    d3.selectAll("circle")
 				    .transition().duration(1000)
 				    .attr("cx", function(d) {
@@ -386,7 +508,7 @@ generateGraph('FG3A', 'FG3M')
 
 
 //
-// HISTOGRAM
+// XHISTOGRAM
 //
 
 // var margin = {top: 10, right: 30, bottom: 30, left: 40},
@@ -411,14 +533,14 @@ generateGraph('FG3A', 'FG3M')
 //       .attr("transform", "translate(0," + height + ")")
 //       .call(d3.axisBottom(x));
 
-//   // set the parameters for the histogram
-//   var histogram = d3.histogram()
+//   // set the parameters for the Xhistogram
+//   var Xhistogram = d3.Xhistogram()
 //       .value(function(d) { return d.FGM; })   // I need to give the vector of value
 //       .domain(x.domain())  // then the domain of the graphic
 //       .thresholds(x.ticks(70)); // then the numbers of bins
 
 //   // And apply this function to data to get the bins
-//   var bins = histogram(data);
+//   var bins = Xhistogram(data);
 
 //   // Y axis: scale and draw:
 //   var y = d3.scaleLinear()
@@ -437,4 +559,7 @@ generateGraph('FG3A', 'FG3M')
 //         .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
 //         .attr("height", function(d) { return height - y(d.length); })
 //         .style("fill", "#69b3a2")
+
+
 // });
+
