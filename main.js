@@ -50,53 +50,31 @@ const PLAYERFRAME = d3.select("#playerframe");
 //plotting user-added points
 document.getElementById("graphButton").addEventListener('click', userGenerateGraph);
 
-function statFromAbbrev(abbrev_name) {
-	switch(abbrev_name){
-		case "FG3A":
-			return "3-Pointers Attempted";
-		case "FG3M":
-			return "3-Pointers Made";
-		case "FG3_PCT":
-			return "3-Point Percentage";
-		case "FGA":
-			return "Field Goals Attempted";
-		case "FGM":
-			return "Field Goals Made";
-		case "FG_PCT":
-			return "Field Goal Percentage";
-		case "GP":
-			return "Games Played";
-		case "FTM":
-			return "Free Throws Made";
-		case "FTA":
-			return "Free Throws Attempted";
-		case "FT_PCT":
-			return "Free Throw Percentage";
-		case "EFG":
-			return "Effective Field Goal Percentage";
-		case "OREB":
-			return "Offensive Rebounds per Game";
-		case "DREB":
-			return "Defensive Rebounds per Game";
-		case "REB":
-			return "Rebounds per Game";
-		case "AST":
-			return "Assists per Game";
-		case "STL":
-			return "Steals per Game";
-		case "BLK":
-			return "Blocks per Game";
-		case "TO":
-			return "Turnovers per Game";
-		case "PF":
-			return "Fouls per Game";
-		case "PTS":
-			return "Points per Game";
-		case "PLUS_MINUS":
-			return "Total Plus-Minus";
-
-	}
+//dictionary for stat abbreviations and their elongated versions
+let statAbbrevs = {
+	"FG3A": "3-Pointers Attempted",
+	"FG3M": "3-Pointers Made",
+	"FG3_PCT": "3-Point Percentage",
+	"FGA": "Field Goals Attempted",
+	"FGM": "Field Goals Made",
+	"FG_PCT": "Field Goal Percentage",
+	"GP": "Games Played",
+	"FTM": "Free Throws Made",
+	"FTA": "Free Throws Attempted",
+	"FT_PCT": "Free Throw Percentage",
+	"EFG": "Effective Field Goal Percentage",
+	"OREB": "Offensive Rebounds per Game",
+	"DREB": "Defensive Rebounds per Game",
+	"REB": "Rebounds per Game",
+	"AST": "Assists per Game",
+	"STL": "Steals per Game",
+	"BLK": "Blocks per Game",
+	"TO": "Turnovers per Game",
+	"PF": "Fouls per Game",
+	"PTS": "Points per Game",
+	"PLUS_MINUS": "Total Plus-Minus"
 }
+
 
 //calculating a player's percentile in a given stat compared to all other players
 function playerPercentile(player, attribute, data) {
@@ -194,7 +172,7 @@ function generateGraph(x, y) {
 						.attr("y", MARGINS.top)
 						.attr("text-anchor", "middle")
 						.style("font-weight", "bold")
-						.text(statFromAbbrev(x) + " vs. " + statFromAbbrev(y));
+						.text(statAbbrevs[x] + " vs. " + statAbbrevs[y]);
 
 		//adding x-axis to scatterplot
 		let xAxis = SCATTERFRAME.append("g")
@@ -209,7 +187,7 @@ function generateGraph(x, y) {
 						.attr("y", FRAME_HEIGHT - 5)
 						.attr("font-size", "15px")
 						.attr("text-anchor", "middle")
-						.text(statFromAbbrev(x));
+						.text(statAbbrevs[x]);
 
 		//adding y-axis to scatterplot
 		let yAxis = SCATTERFRAME.append("g")
@@ -226,7 +204,7 @@ function generateGraph(x, y) {
 							.attr("font-size", "15px")
 							.attr("text-anchor", "middle")
 							.attr('transform', 'rotate(-90)')
-							.text(statFromAbbrev(y));
+							.text(statAbbrevs[y]);
 
 		//adding tooltip
 	 	const TOOLTIP = d3.select("#scattervis")
@@ -382,10 +360,10 @@ function scatterMouseHandler() {
 		TOOLTIP.html("<b>" + d.PLAYER_NAME
 						+ "<br>" + d.TEAM_ABBREVIATION + "</b>"
 						+ "<br>Position: " + d.START_POSITION
-						+ "<br><br>" + statFromAbbrev(x) + ": " + xVal
+						+ "<br><br>" + statAbbrevs[x] + ": " + xVal
 						+ "<br><ul><li>" + "Similar to: " + (selectedXBarSize - 1) + " other player(s)</li>" 
 						+ "<li>" + playerPercentile(d, x, data) + " percentile</li>"
-						+ "</ul>" + statFromAbbrev(y) + ": " + yVal 
+						+ "</ul>" + statAbbrevs[x] + ": " + yVal 
 						+ "<br><ul><li>" + "Similar to: " + (selectedYBarSize - 1) + " other player(s)</li>" 
 						+ "<li>" + playerPercentile(d, y, data) + " percentile</li>")
 	 }
@@ -398,10 +376,17 @@ function scatterMouseHandler() {
 
  	function click(event, d) {
  		PLAYERFRAME.selectAll("*").remove;
- 		PLAYERFRAME.html("<b>" + d.PLAYER_NAME 
- 						+ "<br>" +  d.TEAM_ABBREVIATION + "</b>"
-						+ "<br>Position: " + d.START_POSITION
-						+ "<br><br>Points per Game: " + d.PTS);
+ 		PLAYERFRAME.html("<h3 id=\"playertitle\">Player Profile: " + d.PLAYER_NAME 
+ 						+ "</h3> <b>" +  d.TEAM_ABBREVIATION + "</b>"
+						+ "<br>" + d.START_POSITION
+						+ "<br><br>Points per Game: " + d.PTS
+						+ "<br>Assists per Game: " + d.AST
+						+ "<br>Rebounds per Game: " + d.REB
+						+ "<br>Steals per Game: " + d.STL
+						+ "<br>Blocks per Game: " + d.BLK
+						+ "<br>Turnovers per Game: " + d.TO
+						+ "<br>Fouls per Game: " + d.PF
+		);
  	}
 
 
@@ -492,43 +477,7 @@ function brushHandler() {
 
 }
 
-
-/*
-
-// Add a clipPath: everything out of this area won't be drawn.
-  var clip = Svg.append("defs").append("svg:clipPath")
-      .attr("id", "clip")
-      .append("svg:rect")
-      .attr("width", width )
-      .attr("height", height )
-      .attr("x", 0)
-      .attr("y", 0);
-
-
-		//add brushing
-		SCATTERFRAME.call(d3.brush()                 
-		      .extent([[0,0], [FRAME_WIDTH, FRAME_HEIGHT]])
-		      .on("start brush", updateChart)
-		      );
-
-		// Function that is triggered when brushing is performed
-		function updateChart() {
-			extent = d3.brushSelection(this);
-			scatter.classed("selected", function(d) {
-				return isBrushed(extent, x_axis_scale(d[x]) + MARGINS.left, y_axis_scale(d[y]) + MARGINS.top);
-			});
-		}
-
-		 // A function that return TRUE or FALSE according if a dot is in the selection or not
-		function isBrushed(brush_coords, cx, cy) {
-		     var x0 = brush_coords[0][0],
-		         x1 = brush_coords[1][0],
-		         y0 = brush_coords[0][1],
-		         y1 = brush_coords[1][1];
-		    return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;    // This return TRUE or FALSE depending on if the points is in the selected area
-		}
-	*/
-	});	
+});	
 }
 
 generateGraph('FG3A', 'FG3M')

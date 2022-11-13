@@ -58,6 +58,10 @@ p {
     text-indent: 50px;
 }
 
+.no-justify {
+    text-align: left;
+}
+
 #logo {
     width: 100px;
     height: 100px;
@@ -148,4 +152,9 @@ circle:hover {
 #dropdowns {
     font-size: 15px;
 
+}
+
+#playertitle {
+    text-align: left;
+    margin-bottom: 0px;
 }
