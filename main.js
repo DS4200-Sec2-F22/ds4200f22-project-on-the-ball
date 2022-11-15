@@ -1,6 +1,6 @@
-const FRAME_HEIGHT = 450;
-const FRAME_WIDTH = 550;
-const MARGINS = {left:70, right:70, top:50, bottom:50}
+const FRAME_HEIGHT = 400;
+const FRAME_WIDTH = 500;
+const MARGINS = {left:70, right:80, top:50, bottom:50}
 
 const VIS_HEIGHT = FRAME_HEIGHT - MARGINS.top - MARGINS.bottom;
 const VIS_WIDTH = FRAME_WIDTH - MARGINS.left - MARGINS.right;
@@ -8,6 +8,8 @@ const VIS_WIDTH = FRAME_WIDTH - MARGINS.left - MARGINS.right;
 const BAR_HEIGHT = VIS_HEIGHT / 2;
 
 const BAR_WIDTH = VIS_WIDTH / 2;
+
+const COLORSCHEME = ["rgb(65,187,197)", "rgb(39,76,86)", "rgb(96,223,130)"]
 
 
 const HISTOGRAM_BIN_COUNT = 20;
@@ -75,6 +77,40 @@ let statAbbrevs = {
 	"PLUS_MINUS": "Total Plus-Minus"
 }
 
+//dictionary for team abbreviations and names
+let teamAbbrevs = {
+	"ATL": 	"Atlanta Hawks",
+	'BKN': 	"Brooklyn Nets",
+	'BOS': 	'Boston Celtics',
+	'CHA': 	"Charlotte Hornets",
+	'CHI': 	"Chicago Bulls",
+	'CLE': 	"Cleveland Cavaliers",
+	'DAL': 	"Dallas Mavericks",
+	'DEN': 	"Denver Nuggets",
+	'DET': 	"Detroit Pistons",
+	'GSW': 	"Golden State Warriors",
+	'HOU': 	"Houston Rockets",
+	'IND': 	"Indiana Pacers",
+	'LAC': 	"Los Angeles Clippers",
+	'LAL': 	"Los Angeles Lakers",
+	'MEM':	"Memphis Grizzlies",
+	'MIA': 	"Miami Heat",
+	'MIL': 	"Milwaukee Bucks",
+	'MIN': 	"Minnesota Timberwolves",
+	'NOP': 	"New Orleans Pelicans",
+	'NYK': 	"New York Knicks",
+	'OKC': 	"Oklahoma City Thunder",
+	'ORL': 	"Orlando Magic",
+	'PHI': 	"Philadelphia 76ers",
+	'PHX': 	"Phoenix Suns",
+	'POR': 	"Portland Trail Blazers",
+	'SAC': 	"Sacramento Kings",
+	'SAS': 	"San Antonio Spurs",
+	'TOR': 	"Toronto Raptors",
+	'UTA': 	"Utah Jazz",
+	'WAS': 	"Washington Wizards",
+}
+
 
 //calculating a player's percentile in a given stat compared to all other players
 function playerPercentile(player, attribute, data) {
@@ -110,6 +146,8 @@ function generateGraph(x, y) {
 	d3.csv("player_average.csv").then((data) => {
 		console.log(data);
 
+		let positionColors = d3.select("#showColors").property("checked");
+
 		//preparing x data and axis:
 		let x_data = Array(DATASET_SIZE);
 		for (let n = 0; n < data.length; n++) {
@@ -139,6 +177,7 @@ function generateGraph(x, y) {
 
 
 		SCATTERFRAME.selectAll("circle").remove();
+		SCATTERFRAME.selectAll("#legendBox").remove();
 		SCATTERFRAME.selectAll("g").remove();
 		SCATTERFRAME.selectAll("text").remove();
 		SCATTERFRAME.selectAll(".tooltip").remove();
@@ -163,8 +202,28 @@ function generateGraph(x, y) {
 					.attr("cy", function(d) {
 						return y_axis_scale(d[y]) + MARGINS.bottom;})
 					.attr("r", 4)
-					.attr("class", "point");
+					.attr("class", "point")
+					.style("fill", function(d) {
+						if (positionColors) {
+											return positionColor(d.START_POSITION);
+										} else {
+											return "darkgreen";		
+										}
+									});
 						//(d) => {return d.TEAM_ABBREVIATION});
+
+		function positionColor(position) {
+			switch (position) {
+			case "C":
+				return COLORSCHEME[0];
+			case "F":
+				return COLORSCHEME[1];
+			case "G":
+				return COLORSCHEME[2];
+			default:
+				return "rgb(175, 200, 200)";	
+			}
+		}
 
 		//adding title to scatterplot
 		SCATTERFRAME.append("text")
@@ -205,6 +264,45 @@ function generateGraph(x, y) {
 							.attr("text-anchor", "middle")
 							.attr('transform', 'rotate(-90)')
 							.text(statAbbrevs[y]);
+
+		//appending a legend that shows what each point's color means
+		if (positionColors) {
+			let colorScale = d3.scaleOrdinal()
+			    .domain(["Center", "Forward", "Guard", "N/A"])
+			    .range([COLORSCHEME[0], COLORSCHEME[1], COLORSCHEME[2], "rgb(175, 200, 200)"]);
+
+			let legend = d3.legendColor()
+			    .scale(colorScale);
+
+
+			let legendTest = SCATTERFRAME.append("g").attr("class", "legend").attr("id", "legendTest").attr("transform", "translate(100000, 1000000)").call(legend);
+
+
+
+			let colorBox = document.getElementById("legendTest").getBoundingClientRect(); // get the bounding rectangle
+
+			let legendBase = SCATTERFRAME.append("g")
+											.attr("transform", "translate(" + ( (VIS_WIDTH + MARGINS.right / 2) - 2) + "," + (MARGINS.top * 1.5 - 2) + ")")
+											.attr("id", "legendBase")
+
+			legendBase.append("rect")
+							.attr("id", "legendBox")
+							.attr("width", colorBox.width + 4)
+							.attr("height", colorBox.height + 4)
+							.style("fill", "white")
+							.style("stroke", "black")
+							.style("stroke-width", "1px")
+							.style("border-radius", "2px")
+			
+			SCATTERFRAME.select("#legendTest").remove();
+
+			legendBase.append("g")
+						.attr("transform", "translate(2, 2)")
+						.attr("class", "legend")
+						.attr("id", "colorLegend")
+				        .call(legend)
+
+		} 
 
 		//adding tooltip
 	 	const TOOLTIP = d3.select("#scattervis")
@@ -262,7 +360,7 @@ function generateGraph(x, y) {
           .attr("class", "bar");
 
 
-	 //IN PROGRESS: Y-AXIS HISTOGRAM ENCODING
+	 //Y-AXIS HISTOGRAM ENCODING
 
 	YHISTOGRAM.append("g")
         .attr("transform", "translate(" + (VIS_WIDTH / 2) + "," + 0 + ")")
@@ -294,7 +392,7 @@ function generateGraph(x, y) {
 							 .domain([0, (maxYBinSize * 1.05)])
 							 .range([0, BAR_WIDTH]);
 
-    // X axis: scale and draw:
+    // Y axis: scale and draw:
     YHISTOGRAM.append("g")
     	.attr("transform", "translate(0," + VIS_HEIGHT + ")")
         .call(d3.axisBottom(x_axis_scale_histogram));
@@ -326,7 +424,7 @@ function generateGraph(x, y) {
     brushHandler();
 
 
-//contains handling for mousing over and clicking points on the scatterframe
+//contains handling for mousing over and clicking points on the scatterframe, as well as moving the legend
 function scatterMouseHandler() {
 	   SCATTERFRAME.selectAll("circle")
     	.on("mouseover", mouseover)
@@ -334,6 +432,46 @@ function scatterMouseHandler() {
     	.on("mousemove", mousemove)
     	.on("mouseleave", mouseleave);
 
+    	let numRegex =  /\d+/g;
+
+    	let offsetX, offsetY;
+
+    	let dragHandler = d3.drag()
+    	.on("start", function() {
+    				//current position of box
+    				t = this.getAttribute("transform")
+    				translation = this.getAttribute("transform").match(numRegex);
+    				translationX = parseFloat(translation[0]);
+    				translationY = parseFloat(translation[1]);
+    				console.log(t);
+    				console.log(translationX)
+    				console.log(translationY)
+    				//current position of pointer in relation to whole page
+    				xAbsolute = event.pageX
+    				yAbsolute = event.pageY
+    				offsetX = Math.round(xAbsolute - translationX);
+		    		offsetY = Math.round(yAbsolute - translationY);
+		    		console.log(offsetX);
+		    		console.log(offsetY);
+    		    	})
+    	.on("drag", function () {
+		    		mouse = d3.pointer(event);
+				    SCATTERFRAME.select("#legendBase")
+				        .attr("transform", ("translate(" + (mouse[0] - offsetX) + "," + (mouse[1] - offsetY) + ")"));
+					})
+				    	
+		dragHandler(SCATTERFRAME.select("#legendBase"));
+
+
+
+/*
+    SCATTERFRAME.selectAll(".colorLegend")
+    			.on("drag", mousedrag);
+
+    function mousedrag(event, legend) {
+    	legend.attr("transform", "translate(" + 100 + "," + 200 + ")")
+    }
+*/
     //behavior when mousing over a point
 	 function mouseover(event, d) {
 	 	let selectedXBarSize = null;
@@ -363,7 +501,7 @@ function scatterMouseHandler() {
 						+ "<br><br>" + statAbbrevs[x] + ": " + xVal
 						+ "<br><ul><li>" + "Similar to: " + (selectedXBarSize - 1) + " other player(s)</li>" 
 						+ "<li>" + playerPercentile(d, x, data) + " percentile</li>"
-						+ "</ul>" + statAbbrevs[x] + ": " + yVal 
+						+ "</ul>" + statAbbrevs[y] + ": " + yVal 
 						+ "<br><ul><li>" + "Similar to: " + (selectedYBarSize - 1) + " other player(s)</li>" 
 						+ "<li>" + playerPercentile(d, y, data) + " percentile</li>")
 	 }
@@ -377,7 +515,7 @@ function scatterMouseHandler() {
  	function click(event, d) {
  		PLAYERFRAME.selectAll("*").remove;
  		PLAYERFRAME.html("<h3 id=\"playertitle\">Player Profile: " + d.PLAYER_NAME 
- 						+ "</h3> <b>" +  d.TEAM_ABBREVIATION + "</b>"
+ 						+ "</h3> <b>" +  getTeam(d.TEAM_ABBREVIATION) + "</b>"
 						+ "<br>" + d.START_POSITION
 						+ "<br><br>Points per Game: " + d.PTS
 						+ "<br>Assists per Game: " + d.AST
@@ -386,7 +524,24 @@ function scatterMouseHandler() {
 						+ "<br>Blocks per Game: " + d.BLK
 						+ "<br>Turnovers per Game: " + d.TO
 						+ "<br>Fouls per Game: " + d.PF
+						+ "<br><br>Field Goal Percentage: " + toPct(d.FG_PCT)
+						+ "<br>3-Point Percentage: " + toPct(d.FG3_PCT)
+						+ "<br>Free Throw Percentage: " + toPct(d.FT_PCT)
+						+ "<br>Effective Field Goal Percentage: " + toPct(d.EFG)
+
 		);
+ 	}
+
+ 	function getTeam(teamAbbrev) {
+ 		if (teamAbbrev.includes('/')) {
+ 			return teamAbbrevs[teamAbbrev.substring(0, 3)] + "/" + getTeam(teamAbbrev.substring(4))
+ 		} else {
+ 			return teamAbbrevs[teamAbbrev]
+ 		}
+ 	}
+
+ 	function toPct(dbl) {
+ 		return Math.round(dbl * 10000) / 100 + "%"
  	}
 
 
@@ -405,7 +560,7 @@ function brushHandler() {
 	      .attr("id", "clip")
 	      .append("rect")
 	      .attr("width", VIS_WIDTH + 5)
-	      .attr("height", VIS_HEIGHT + 5)
+	      .attr("height", VIS_HEIGHT + 2)
 	      .attr("transform", "translate(" + (MARGINS.left) + "," + (MARGINS.top) + ")");
 
 
