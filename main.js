@@ -77,6 +77,14 @@ let statAbbrevs = {
 	"PLUS_MINUS": "Total Plus-Minus"
 }
 
+//dictionary for position names
+let positionNames = {
+	"C": "Center",
+	"F": "Forward",
+	"G": "Guard",
+	"": "position not found"
+}
+
 //dictionary for team abbreviations and names
 let teamAbbrevs = {
 	"ATL": 	"Atlanta Hawks",
@@ -439,13 +447,9 @@ function scatterMouseHandler() {
     	let dragHandler = d3.drag()
     	.on("start", function() {
     				//current position of box
-    				t = this.getAttribute("transform")
     				translation = this.getAttribute("transform").match(numRegex);
     				translationX = parseFloat(translation[0]);
     				translationY = parseFloat(translation[1]);
-    				console.log(t);
-    				console.log(translationX)
-    				console.log(translationY)
     				//current position of pointer in relation to whole page
     				xAbsolute = event.pageX
     				yAbsolute = event.pageY
@@ -463,15 +467,6 @@ function scatterMouseHandler() {
 		dragHandler(SCATTERFRAME.select("#legendBase"));
 
 
-
-/*
-    SCATTERFRAME.selectAll(".colorLegend")
-    			.on("drag", mousedrag);
-
-    function mousedrag(event, legend) {
-    	legend.attr("transform", "translate(" + 100 + "," + 200 + ")")
-    }
-*/
     //behavior when mousing over a point
 	 function mouseover(event, d) {
 	 	let selectedXBarSize = null;
@@ -516,7 +511,7 @@ function scatterMouseHandler() {
  		PLAYERFRAME.selectAll("*").remove;
  		PLAYERFRAME.html("<h3 id=\"playertitle\">Player Profile: " + d.PLAYER_NAME 
  						+ "</h3> <b>" +  getTeam(d.TEAM_ABBREVIATION) + "</b>"
-						+ "<br>" + d.START_POSITION
+						+ "<br>" + positionNames[d.START_POSITION]
 						+ "<br><br>Points per Game: " + d.PTS
 						+ "<br>Assists per Game: " + d.AST
 						+ "<br>Rebounds per Game: " + d.REB
