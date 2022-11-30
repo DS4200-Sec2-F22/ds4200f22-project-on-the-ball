@@ -179,3 +179,8 @@ circle:hover {
     overflow:auto;
     padding: 5px;
 }
+
+#instructions {
+    margin-top: 0px;
+    flex-direction: column;
+}
