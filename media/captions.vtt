@@ -1,0 +1,63 @@
+WEBVTT
+Kind: captions
+Language: en
+
+00:00:02.340 --> 00:00:08.280
+For this group, our project was an analytics&nbsp;
+visualization tool for a basketball analyst.&nbsp;&nbsp;
+
+00:00:08.280 --> 00:00:13.740
+We called it on the ball, so the four contributors&nbsp;
+to our project where Samuel Hepner, Toby Kaufman,&nbsp;&nbsp;
+
+00:00:13.740 --> 00:00:22.020
+Justin Salim, and Neman razdan, and this project&nbsp;
+was for ds4200. So now I'm going to be showing&nbsp;&nbsp;
+
+00:00:22.020 --> 00:00:31.080
+you guys exactly how this tool works. So as you&nbsp;
+can see here this is our tool and our tool was&nbsp;&nbsp;
+
+00:00:31.080 --> 00:00:36.360
+a scatter plot that showed the distribution&nbsp;
+of different players of the NBA selecting two&nbsp;&nbsp;
+
+00:00:36.360 --> 00:00:43.140
+statistics. So as you can see here I can change&nbsp;
+the different statistics on the X and Y axis and&nbsp;&nbsp;
+
+00:00:43.140 --> 00:00:50.400
+then it'll generate charts for each individual&nbsp;
+player. So an example here would be field goals&nbsp;&nbsp;
+
+00:00:50.400 --> 00:00:57.180
+made on the x-axis and games played on the y-axis&nbsp;
+and as you can see if you generated a chart&nbsp;&nbsp;
+
+00:00:58.080 --> 00:01:04.920
+usually the people with more games played also&nbsp;
+made more field goals. As you can see and so&nbsp;&nbsp;
+
+00:01:04.920 --> 00:01:11.880
+let's look if you select any player over here&nbsp;
+you see Jason Tatum made 616 field goals and&nbsp;&nbsp;
+
+00:01:11.880 --> 00:01:16.140
+played 67 games as a specific example, And&nbsp;
+you can see what percentile they're also in.&nbsp;&nbsp;
+
+00:01:18.480 --> 00:01:24.240
+So as an addition to that the histogram on each&nbsp;
+axis also represents the distribution of each&nbsp;&nbsp;
+
+00:01:24.240 --> 00:01:32.100
+player's for each statistic, and the legend&nbsp;
+Also may hide some players as a disclaimer,&nbsp;&nbsp;
+
+00:01:32.100 --> 00:01:34.920
+but this is just how our visualization tool works.&nbsp;&nbsp;
+
+00:01:34.920 --> 00:01:38.400
+And I think there's a really interesting&nbsp;
+cool tool that you guys could also use.
+

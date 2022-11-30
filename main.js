@@ -151,7 +151,7 @@ function userGenerateGraph() {
 
 //using two stat abbreviations, generate a graph
 function generateGraph(x, y) {
-	d3.csv("player_average.csv").then((data) => {
+	d3.csv("data/player_average.csv").then((data) => {
 		console.log(data);
 
 		let positionColors = d3.select("#showColors").property("checked");
